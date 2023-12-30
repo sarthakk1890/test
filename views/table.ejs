@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Table Cube</title>
+    <style>
+      body {
+        margin-top: 60px;
+      }
+
+      table {
+        width: 60%;
+        border-collapse: collapse;
+        margin: 20px auto;
+        animation: fadeIn 1s ease-in-out;
+      }
+
+      h1 {
+        margin-left: 300px;
+      }
+
+      th,
+      td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
+      }
+
+      th {
+        background-color: lightgray;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 768px) {
+        table {
+          width: 90%;
+        }
+        h1 {
+          margin-left: 20px;
+          font-size: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Cube Admin</h1>
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Shop Name</th>
+        <th>OrderID</th>
+        <th>Order Status</th>
+        <th>Product Name</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Total Price</th>
+      </tr>
+      <% for (let i = 0; i < data.length; i++) { %>
+      <tr>
+        <td><%= data[i].date %></td>
+        <td><%= data[i].sellerName %></td>
+        <td><%= data[i].orderId %></td>
+        <td><%= data[i].status %></td>
+        <td><%= data[i].productName %></td>
+        <td><%= data[i].price %></td>
+        <td><%= data[i].quantity %></td>
+        <td><%= data[i].quantity * data[i].price %></td>
+      </tr>
+      <% } %>
+    </table>
+    <div style="text-align: center;">
+      <% if (page > 1) { %>
+        <a href="/api/table?page=<%= page - 1 %>&limit=10">Previous</a>
+      <% } %>
+      <% if (page < pages) { %>
+        <a href="/api/table?page=<%= page + 1 %>&limit=10">Next</a>
+      <% } %>
+    </div>
+  </body>
+</html>

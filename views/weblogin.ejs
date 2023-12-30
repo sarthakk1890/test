@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Login</title>
+</head>
+<style>
+    * {
+    margin: 0;
+    padding: 0;
+    background-color: #ffff;
+
+  }
+  .main{
+    width: 40%;
+    margin: 2rem auto;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    border-radius: 1rem;
+
+  }
+  .main form{
+    display: flex;
+    flex-direction: column;
+    
+  }
+  .main form input,button{
+    padding: 0.6rem;
+    border: 0.1rem solid black;
+    border-radius: 1rem;
+    margin-top: 0.7rem;
+  }
+  .main form button{
+    color: #fff;
+    background-color: blue;
+  }
+  @media(max-width:910px) {
+    .main {
+      width: 75%;
+      margin: 2rem auto;
+
+
+
+    }
+  }
+</style>
+<body>
+    <div class="main">
+        <div class="form">
+            <form action="/api/v1/weblogin" method="post">
+                <input type="email" name="email" id="" placeholder="enter email">
+                <input type="password" name="password" id="" placeholder="enter password">
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

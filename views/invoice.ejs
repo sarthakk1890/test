@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shopos - Invoice</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.css"
+  />
+  <style>
+    .invoice-summary {
+      margin-top: 20px;
+      /* background-color: aquamarine; */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .invoice-summary p{
+        width: 50%;
+        margin: 0%;
+        padding: 0%;
+        display: flex;
+      /* align-items: center;
+      justify-content: center; */
+    }
+
+    .invoice-summary strong {
+      display: inline-block;
+      width: 100px; /* Adjust the width as needed */
+    }
+    .bill{
+        display: flex;
+        flex-direction: column;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        Invoice <%= invoice %>
+        <span class="float-right"> <strong>Date: <%=date%> </strong> <!-- Insert dynamic date here --></span>
+      </div>
+      <div class="card-body">
+        <div class="mb-4 row">
+          <div class="col-sm-6">
+            <h6 class="mb-3">From:</h6>
+            <div>
+              <strong> <%= companyName %> </strong>
+            </div>
+            <div> locality: <%= address.locality %> </div>
+            <div> city: <%= address.city %> </div>
+            <div> state: <%= address.state %> </div>
+            <div>Email:  <%= email %> </div>
+            <div>Phone: <%= phone %></div>
+          </div>
+        </div>
+
+        <div class="table-responsive-sm">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Qty</th>
+                <th>Rate/Unit</th>
+                <th>GST</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+                <% var subTotal = 0; %>
+                <% var gstTotal = 0; %>
+                <% orderItem.forEach(function(item) { %>
+                    <% var itemSubTotal = item.quantity * (item.product.baseSellingPriceGst ? item.product.baseSellingPriceGst : item.product.sellingPrice); %>
+                    <% var itemGst = item.quantity * (item.product.gstRate || 0); %>
+                    <% subTotal += itemSubTotal; %>
+                    <% gstTotal += itemGst; %>
+                    <tr>
+                      <td><%= item.product.name %></td>
+                      <td><%= item.quantity %></td>
+                      <td><%= item.product.baseSellingPriceGst ? item.product.baseSellingPriceGst : item.product.sellingPrice %> </td>
+                      <td> <%= item.product.gstRate %> </td>
+                      <td><%= itemSubTotal + item.product.gstRate  %></td>
+                    </tr>
+                  <% }); %>
+            </tbody>
+            <tfoot>
+              <tr>
+                
+                <td class="bill text-left">
+                  <strong class="invoice-summary"> <p>Sub-Total</p>  <p>₹ <%= subTotal.toFixed(2) %></p></strong>
+                  <strong class="invoice-summary"> <p>GST</p> <p>₹ <%= gstTotal.toFixed(2) %></p></strong>
+                  <strong class="invoice-summary"><p>Total</p> <p>₹ <%= (subTotal + gstTotal).toFixed(2) %></p></strong>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer text-center">Thank you for your business!</div>
+    </div>
+  </div>
+  
+</body>
+</html>

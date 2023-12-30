@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    background-color: #ffff;
+
+  }
+
+  .container {
+    margin: 1rem auto;
+    width: 40%;
+    padding: 1.5rem;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+
+
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+
+
+  }
+
+  form .box input {
+    padding: 0.6rem;
+    border-radius: 0.8rem;
+
+  }
+
+  form .box label {
+    font-size: 1.5rem;
+    padding: 0.5rem 0 0.3rem;
+
+  }
+
+  .box {
+    margin: 1rem 0 1rem;
+    display: flex;
+    flex-direction: column;
+
+  }
+
+  .box-1 {
+    margin: 1rem 0 1rem;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 3rem;
+    height: 1.5rem;
+  }
+
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 1rem;
+    width: 1rem;
+    left: 0.1rem;
+    bottom: 0.2rem;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+
+  .switch input:checked+.slider {
+    background-color: #2196F3;
+  }
+
+  .switch input:focus+.slider {
+    box-shadow: 0 0 1px #2196F3;
+  }
+
+  .switch input:checked+.slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+
+
+  .slider.round {
+    border-radius: 1rem;
+  }
+
+  .slider.round:before {
+    border-radius: 50%;
+  }
+
+  #toggle-content {
+    display: none;
+  }
+
+  .switch input:checked+.slider+.toggle-content {
+    display: block;
+  }
+
+  #img {
+    width: 8rem;
+    height: 8rem;
+
+
+  }
+
+  .box select {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-radius: 0.8rem;
+  }
+
+  .box select option {
+    padding: 0.8rem;
+  }
+
+  #image-input {
+    display: none;
+
+  }
+
+  #image-preview {
+    cursor: pointer;
+  }
+
+  .box-check {
+    display: flex;
+    gap: 0.6rem;
+    font-size: 1.2rem;
+
+  }
+
+  .box-check input {
+    height: 1.2rem;
+    width: 1.2rem;
+    margin: 0.5rem;
+
+  }
+
+  .box button {
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    border-radius: 0.8rem;
+    cursor: pointer;
+    background-color: blue;
+    font-weight: bold;
+    color: #fff;
+    border: none;
+  }
+
+  .box .radio {
+    display: flex;
+    gap: 1rem;
+    border: 0.1rem solid black;
+    border-radius: 0.8rem;
+    padding: 0.1rem 0.5rem;
+  }
+
+  @media(max-width:910px) {
+    .container {
+      width: 85%;
+
+
+    }
+  }
+</style>
+<script>
+  function selectImage() {
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function (event) {
+      if (event.target.files.length == 1) {
+        previewImage(event);
+      }
+      document.body.removeChild(input);
+    };
+    input.click();
+
+  }
+  function previewImage(event) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      var output = document.querySelector('#image-preview img');
+      output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+  }
+
+
+  function toggleContent() {
+    var x = document.getElementById("toggle-content")
+
+    if (x.style.display == "block") {
+      x.style.display = "none";
+    }
+    else {
+      x.style.display = "block";
+    }
+  }
+
+
+</script>
+
+<body>
+  <div class="container">
+    <div class="box-sign">
+      <h1>Sign Up</h1>
+      <p>Set up your profile to enjoy our services</p>
+    </div>
+    <div class="box">
+      <div id="image-preview" onclick="selectImage()">
+        <img src="https://cdn-icons-png.flaticon.com/128/9502/9502726.png" id="img" alt="Click to select image">
+      </div>
+    </div>
+    <form action="/api/v1/registration" method="post">
+      <div class="box">
+        <label for="">Business Name</label>
+        <input type="text" name="businessName" required>
+      </div>
+      <div class="box">
+        <label for="">Business Type</label>
+        <select name="businessType">
+          <option>Food</option>
+          <option>Grocery</option>
+          <option>Medical</option>
+          <option>Fashion</option>
+          <option>Stationary</option>
+          <option>Electrical</option>
+        </select>
+      </div>
+      <div class="box">
+        <label for="locality">Locality:</label>
+        <input type="text" id="locality" name="locality" required>
+      </div>
+      <div class="box">
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" required>
+      </div>
+      <div class="box">
+        <label for="state">State:</label>
+        <input type="text" id="state" name="state" required>
+      </div>
+      <div class="box">
+        <label for="country">Country:</label>
+        <input type="text" id="country" name="country" required>
+      </div>
+      <div class="box">
+        <label for="">UPI ID (optional)</label>
+        <input type="text" name="upi_id">
+      </div>
+      <div class="box-1">
+        <label class="switch">
+          <input type="checkbox" id="toggleCheckbox" onclick="toggleContent()">
+          <span class="slider round"> </span>
+        </label>
+        <p>Have GSTIN?</p>
+      </div>
+      <div id="toggle-content">
+        <div class="box">
+          <label for="">GSTIN</label>
+          <input type="text" name="GstIN" >
+        </div>
+        <div class="box">
+          <label for="">Type</label>
+          <div class="radio">
+            <input type="radio" id="monthly" name="taxFile" value="monthly">
+            <label for="monthly">Monthly</label>
+            <input type="radio" id="quaterly" name="taxFile" value="quaterly">
+            <label for="quaterly">Quarterly</label>
+          </div>
+        </div>
+      </div>
+      <div class="box">
+        <label for="">Email</label>
+        <input type="email" name="email" required>
+      </div>
+      <div class="box">
+        <label for="">Password</label>
+        <input type="password" name="password" required>
+      </div>
+      <div class="box">
+        <label for="">Confirm Password</label>
+        <input type="password" name="confirmPassword" required>
+      </div>
+      <div class="box">
+        <label for="">Referral (if any)</label>
+        <input type="text" name="referredBy">
+      </div>
+      <div class="box">
+        <label for="">Phone Number</label>
+        <input type="number" name="phoneNumber" required>
+      </div>
+      <div class="box-check">
+        <input type="checkbox" name="agreeTerms">
+        <p>By signing up, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
+      </div>
+      <div class="box">
+        <button type="submit">Create Account</button>
+      </div>
+    </form>
+     
+    
+  </div>
+</body>
+</html>
