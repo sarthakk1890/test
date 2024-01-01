@@ -206,19 +206,14 @@ exports.addCreditSettleTransaction = catchAsyncErrors(
 
 exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
-  const data = await SalesOrder.find({
+ const data = await SalesOrder.find({
   party: id,
   $or: [
-    // For array format
-    {
-      "modeOfPayment.mode": { $in: ["Credit", "Settle"] }
-    },
-    // For string format (backward compatibility)
-    {
-      modeOfPayment: { $in: ["Credit", "Settle"] }
-    }
+    { "modeOfPayment.mode": { $in: ["Credit", "Settle"] } },
+    { modeOfPayment: { $in: ["Credit", "Settle"] } }
   ]
 }).sort({ createdAt: -1 });
+
 
   // Print the retrieved data for debugging
   console.log("Retrieved Sales Order Data:", data);
