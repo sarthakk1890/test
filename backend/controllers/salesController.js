@@ -6,6 +6,14 @@ const inventoryController = require("./inventoryController");
 const User = require("../models/userModel");
 const moment = require('moment-timezone');
 
+function concatenateValues(obj) {
+
+  const arrNew = Object.values(JSON.parse((JSON.stringify(obj))));
+  const word = arrNew.slice(0, -1).join('');
+
+  return word;
+}
+
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
   const { orderItems, modeOfPayment, party, invoiceNum, reciverName, gst, businessName, businessAddress } = req.body;
@@ -174,6 +182,15 @@ exports.getCreditSaleOrders = catchAsyncErrors(async (req, res, next) => {
       },
     },
   ]);
+
+  data.map((value, idx) => {
+    if (!Array.isArray(value.modeOfPayment)) {
+      const mode = value.modeOfPayment;
+      const amount = value.total;
+      value.modeOfPayment = { mode, amount };
+    }
+  })
+
   if (!data) {
     return next(new ErrorHandler("Orders not found", 404));
   }
@@ -206,25 +223,32 @@ exports.addCreditSettleTransaction = catchAsyncErrors(
 
 exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
- const data = await SalesOrder.find({
-  party: id,
-  $or: [
-    { "modeOfPayment.mode": { $in: ["Credit", "Settle"] } },
-    { modeOfPayment: { $in: ["Credit", "Settle"] } }
-  ]
-}).sort({ createdAt: -1 });
+  const data = await SalesOrder.find({
+    party: id
+  }).sort({ createdAt: -1 });
 
+  data.map((value, idx) => {
+    if (!value.modeOfPayment[0].mode) {
+      const mode = concatenateValues(value.modeOfPayment[0]);
+      const amount = value.total;
+      value.modeOfPayment[0] = { mode, amount };
+    }
+  })
+
+  const elementsWithCredit = data.filter(item => {
+    return item.modeOfPayment.some(payment => payment.mode === "Credit");
+  });
 
   // Print the retrieved data for debugging
-  console.log("Retrieved Sales Order Data:", data);
+  console.log("Retrieved Sales Order Data:", elementsWithCredit);
 
-  if (!data) {
+  if (!elementsWithCredit) {
     return next(new ErrorHandler("Order not found with this Id", 404));
   }
 
   res.status(200).json({
     success: true,
-    data,
+    data: elementsWithCredit,
   });
 });
 
