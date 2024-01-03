@@ -248,7 +248,7 @@ exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
   })
 
   const elementsWithCredit = data.filter(item => {
-    return item.modeOfPayment.some(payment => payment.mode === "Credit");
+    return item.modeOfPayment.some(payment => ["Credit", "Settle"].includes(payment.mode));
   });
 
   if (!elementsWithCredit) {
