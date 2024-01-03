@@ -208,8 +208,16 @@ exports.getCreditPurchaseOrders = catchAsyncErrors(async (req, res, next) => {
  */
 exports.addCreditHistoryTransaction = catchAsyncErrors(
   async (req, res, next) => {
-    const { amount, modeOfPayment } = req.body;
     const id = req.params.id;
+    const { amount } = req.body;
+    let modeOfPayment = req.body.modeOfPayment;
+
+    if(!Array.isArray(modeOfPayment)){
+      const mode = modeOfPayment;
+      
+      modeOfPayment = [{mode, amount}]
+    }
+
     const order = {
       party: id,
       total: amount,
