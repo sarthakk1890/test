@@ -199,12 +199,21 @@ exports.getCreditSaleOrders = catchAsyncErrors(async (req, res, next) => {
     data,
   });
 });
+
 exports.addCreditSettleTransaction = catchAsyncErrors(
   async (req, res, next) => {
     const partyId = req.params.id;
     const indiaTime = moment.tz('Asia/Kolkata');
     const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
-    const { amount, modeOfPayment } = req.body;
+    const { amount } = req.body;
+    let modeOfPayment = req.body.modeOfPayment;
+
+    if(!Array.isArray(modeOfPayment)){
+      const mode = modeOfPayment;
+      
+      modeOfPayment = [{mode, amount}]
+    }
+
     const order = {
       party: partyId,
       total: amount,
