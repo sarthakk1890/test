@@ -52,6 +52,10 @@ const estimateSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  estimateNum:{
+    type: Number,
+    required: true
+  },
   createdAt: {
     type: String,
   },
