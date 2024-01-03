@@ -1,7 +1,7 @@
 const express = require("express");
 
 const { isAuthenticatedUser } = require("../middleware/auth");
-const { createEstimate, updateEstimate, convertEstimateToSalesOrder, getEstimate, getAllEstimates } = require("../controllers/estimateController");
+const { createEstimate, updateEstimate, convertEstimateToSalesOrder, getEstimate, getAllEstimates, getNumberofEstimates, resetEstimatesCount } = require("../controllers/estimateController");
 
 const router = express.Router();
 
@@ -13,5 +13,9 @@ router.route("/estimate/:id")
 .get(isAuthenticatedUser, getEstimate)
 .put(isAuthenticatedUser, updateEstimate)
 .post(isAuthenticatedUser, convertEstimateToSalesOrder);
+
+router.route("/estimatesNum")
+  .get(isAuthenticatedUser, getNumberofEstimates)
+  .put(isAuthenticatedUser, resetEstimatesCount)
 
 module.exports = router;
