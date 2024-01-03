@@ -284,7 +284,8 @@ const SalesReturn = require("../models/SalesReturnModel"); // Import the SalesRe
 
 exports.salesReturn = catchAsyncErrors(async (req, res, next) => {
   console.log('Sales Return');
-  const { orderItems, modeOfPayment, party, invoiceNum, reciverName, gst, businessName } = req.body;
+  // const { orderItems, modeOfPayment, party, invoiceNum, reciverName, gst, businessName } = req.body;
+  const { orderItems, party, invoiceNum, reciverName, gst, businessName } = req.body;
 
   const indiaTime = moment.tz('Asia/Kolkata');
   const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
@@ -318,7 +319,7 @@ exports.salesReturn = catchAsyncErrors(async (req, res, next) => {
     const salesReturn = await SalesReturn.create({
       orderItems,
       party,
-      modeOfPayment,
+      // modeOfPayment,
       total,
       user: req.user._id,
       createdAt: currentDateTimeInIndia,
