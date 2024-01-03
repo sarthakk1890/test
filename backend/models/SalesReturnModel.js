@@ -22,11 +22,11 @@ const salesReturnSchema = new mongoose.Schema({
       // Add any other fields you need for each item
     },
   ],
-  modeOfPayment: {
-    type: String,
-    enum: ["Cash", "Credit", "Bank Transfer", "Settle","UPI"],
-    required: true,
-  },
+  // modeOfPayment: {
+  //   type: String,
+  //   enum: ["Cash", "Credit", "Bank Transfer", "Settle","UPI"],
+  //   required: true,
+  // },
   total: {
     type: Number,
     required: true,
