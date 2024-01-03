@@ -137,6 +137,10 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    numEstimates:{
+      type: Number,
+      default: 0
+    },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },
