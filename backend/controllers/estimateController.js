@@ -7,7 +7,7 @@ const moment = require('moment-timezone');
 
 //Create new Estimate 
 exports.createEstimate = catchAsyncErrors(async (req, res, next) => {
-    const { orderItems, reciverName, gst, businessName, businessAddress } = req.body;
+    const { orderItems, reciverName, gst, businessName, businessAddress, estimateNum} = req.body;
 
     for (const item of orderItems) {
         const product = await Inventory.findById(item.product);
@@ -22,12 +22,16 @@ exports.createEstimate = catchAsyncErrors(async (req, res, next) => {
         orderItems,
         total,
         user: req.user._id,
+        estimateNum,
         createdAt: moment().tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss'),
         reciverName,
         businessName,
         businessAddress,
         gst
     });
+
+    // Increment numSales in User model
+    await User.findByIdAndUpdate(req.user._id, { $inc: { numEstimates: 1 } });
 
     res.status(201).json({
         success: true,
@@ -149,3 +153,42 @@ exports.convertEstimateToSalesOrder = catchAsyncErrors(async (req, res, next) =>
 
 });
 
+//Get number of estimates
+exports.getNumberofEstimates = catchAsyncErrors(async (req, res, next) => {
+    const userId = req.user._id;
+  
+    try {
+      const user = await User.findById(userId);
+  
+      if (!user) {
+        return next(new ErrorHandler("User not found", 400));
+      }
+  
+      const numEstimates = user.numEstimates;
+  
+      res.status(200).json({
+        success: true,
+        numEstimates,
+      });
+    } catch (err) {
+      return next(new ErrorHandler("Error fetching number of sales", 500));
+    }
+  });
+  
+  
+  //Reset number of estimates
+  exports.resetEstimatesCount = catchAsyncErrors(async (req, res, next) => {
+    const userId = req.user._id;
+    const { numEstimates = 0 } = req.body;
+  
+    try {
+      await User.findByIdAndUpdate(userId, { $set: { numEstimates } }, { upsert: true });
+  
+      res.status(200).json({
+        success: true,
+        message: "Sales count reset successfully",
+      });
+    } catch (err) {
+      return next(new ErrorHandler("Error resetting sales count", 500));
+    }
+  });
