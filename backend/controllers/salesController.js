@@ -7,10 +7,8 @@ const User = require("../models/userModel");
 const moment = require('moment-timezone');
 
 function concatenateValues(obj) {
-
   const arrNew = Object.values(JSON.parse((JSON.stringify(obj))));
   const word = arrNew.slice(0, -1).join('');
-
   return word;
 }
 
@@ -87,7 +85,8 @@ const calcTotalAmount = (orderItems) => {
 
 // get Single sales Order
 exports.getSingleSalesOrder = catchAsyncErrors(async (req, res, next) => {
-  const salesOrder = await SalesOrder.findById(req.params.id).populate(
+  const invoiceNum = req.params.id;
+  const salesOrder = await SalesOrder.findOne({invoiceNum}).populate(
     "user",
     "name email"
   );
@@ -208,10 +207,10 @@ exports.addCreditSettleTransaction = catchAsyncErrors(
     const { amount } = req.body;
     let modeOfPayment = req.body.modeOfPayment;
 
-    if(!Array.isArray(modeOfPayment)){
+    if (!Array.isArray(modeOfPayment)) {
       const mode = modeOfPayment;
-      
-      modeOfPayment = [{mode, amount}]
+
+      modeOfPayment = [{ mode, amount }]
     }
 
     const order = {
@@ -248,6 +247,7 @@ exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
     return item.modeOfPayment.some(payment => ["Credit", "Settle"].includes(payment.mode));
   });
 
+
   // Print the retrieved data for debugging
   console.log("Retrieved Sales Order Data:", elementsWithCredit);
 
@@ -280,6 +280,8 @@ exports.UpdateSalesOrder = catchAsyncErrors(async (req, res, next) => {
       ErrorHandler(err);
     });
 });
+
+
 const SalesReturn = require("../models/SalesReturnModel"); // Import the SalesReturn model
 
 exports.salesReturn = catchAsyncErrors(async (req, res, next) => {
@@ -295,7 +297,7 @@ exports.salesReturn = catchAsyncErrors(async (req, res, next) => {
     if (!product) {
       return next(new ErrorHandler("Product not found", 404));
     }
-
+    
     // Increase main product quantity
     product.quantity += item.quantity;
 
