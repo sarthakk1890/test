@@ -50,7 +50,7 @@ const calcTotalAmount = (orderItems) => {
 //Get single Estimate
 exports.getEstimate = catchAsyncErrors(async (req, res, next) => {
     const user = req.user._id;
-    const { estimateNum } = req.body;
+    const { estimateNum } = req.params;
 
     const estimate = await Estimate.findOne(
         { user,  },
