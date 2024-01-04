@@ -71,10 +71,11 @@ exports.getEstimate = catchAsyncErrors(async (req, res, next) => {
 //Update Estimate
 exports.updateEstimate = catchAsyncErrors(async (req, res, next) => {
     const user = req.user._id;
-    const { estimateNum } = req.body;
+    const { estimateNum } = req.params;
 
     const updatedEstimate = await Estimate.findOneAndUpdate(
         { user, estimateNum },
+        req.body,
         { new: true, runValidators: true }
     );
 
