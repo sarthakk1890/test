@@ -163,6 +163,7 @@ exports.getCreditPurchaseParties = catchAsyncErrors(async (req, res, next) => {
     data: parties,
   });
 });
+
 exports.getCreditPurchaseParty = catchAsyncErrors(async (req, res, next) => {
   const user = req.user._id;
   const partyId = req.params.id;
@@ -214,10 +215,71 @@ exports.getCreditPurchaseParty = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// exports.getCreditSaleParty = catchAsyncErrors(async (req, res, next) => {
+//   const user = req.user._id;
+//   const partyId = req.params.id;
+//   const id = mongoose.Types.ObjectId(partyId);
+//   const parties = await Party.aggregate([
+//     {
+//       $match: { user, _id: id },
+//     },
+//     { $limit: 1 },
+//     {
+//       $lookup: {
+//         from: SalesModel.collection.name,
+//         localField: "_id",
+//         foreignField: "party",
+//         as: "sale",
+//         pipeline: [
+//           {
+//             $match: {
+//               $expr: {
+//                 $in: ["$modeOfPayment", ["Settle", "Credit"]],
+//               },
+//             },
+//           },
+//         ],
+//       },
+//     },
+//     {
+//       $addFields: {
+//         totalCreditAmount: { $sum: "$sale.total" },
+//       },
+//     },
+//     {
+//       $unset: ["sale"],
+//     },
+//   ]);
+//   const party = parties[0];
+//   const totalCreditAmount = await partyCreditSaleHistoryTotal(
+//     partyId,
+//     "Credit"
+//   );
+//   const totalSettledAmount = await partyCreditSaleHistoryTotal(
+//     partyId,
+//     "Settle"
+//   );
+//   const data = {
+//     ...party,
+//     totalCreditAmount,
+//     totalSettledAmount,
+//     balance: totalCreditAmount - totalSettledAmount,
+//   };
+//   if (!data) {
+//     return next(new ErrorHandler("Orders not found", 404));
+//   }
+//   res.status(200).json({
+//     success: true,
+//     data: data,
+//   });
+// });
+
+
 exports.getCreditSaleParty = catchAsyncErrors(async (req, res, next) => {
   const user = req.user._id;
   const partyId = req.params.id;
   const id = mongoose.Types.ObjectId(partyId);
+
   const parties = await Party.aggregate([
     {
       $match: { user, _id: id },
@@ -231,9 +293,20 @@ exports.getCreditSaleParty = catchAsyncErrors(async (req, res, next) => {
         as: "sale",
         pipeline: [
           {
+            $addFields: {
+              modeOfPaymentArray: {
+                $cond: {
+                  if: { $isArray: "$modeOfPayment" },
+                  then: "$modeOfPayment",
+                  else: [{ mode: "$modeOfPayment", amount: "$total" }],
+                },
+              },
+            },
+          },
+          {
             $match: {
               $expr: {
-                $in: ["$modeOfPayment", ["Settle", "Credit"]],
+                $in: ["$modeOfPaymentArray.mode", ["Settle", "Credit"]],
               },
             },
           },
@@ -242,51 +315,121 @@ exports.getCreditSaleParty = catchAsyncErrors(async (req, res, next) => {
     },
     {
       $addFields: {
-        totalCreditAmount: { $sum: "$sale.total" },
+        totalCreditAmount: { $sum: "$sale.modeOfPaymentArray.amount" },
       },
     },
     {
       $unset: ["sale"],
     },
   ]);
+
   const party = parties[0];
-  const totalCreditAmount = await partyCreditSaleHistoryTotal(
-    partyId,
-    "Credit"
-  );
-  const totalSettledAmount = await partyCreditSaleHistoryTotal(
-    partyId,
-    "Settle"
-  );
+
+  const totalCreditAmount = await partyCreditSaleHistoryTotal(partyId, "Credit");
+  const totalSettledAmount = await partyCreditSaleHistoryTotal(partyId, "Settle");
+
   const data = {
     ...party,
     totalCreditAmount,
     totalSettledAmount,
     balance: totalCreditAmount - totalSettledAmount,
   };
+
   if (!data) {
     return next(new ErrorHandler("Orders not found", 404));
   }
+
   res.status(200).json({
     success: true,
     data: data,
   });
 });
+
+
+
+// /**
+//  *
+//   * @param {Number} partyId
+//   * @param {Number} modeOfPayment
+//   * @returns {Promise<{total: Number, totalCredit: Number, totalSettled: Number}>}
+// */
+
+// const partyCreditSaleHistoryTotal = async (partyId, modeOfPayment) => {
+//   const data = await SalesModel.aggregate([
+//     {
+//       $match: {
+//         modeOfPayment: { $in: [modeOfPayment] },
+//         party: mongoose.Types.ObjectId(partyId),
+//       },
+//     },
+
+//     {
+//       $group: {
+//         _id: "$itemNumber",
+//         total: {
+//           $sum: "$total",
+//         },
+//       },
+//     },
+//   ]);
+//   let total = 0;
+//   if (!isEmpty(data)) {
+//     total = data[0].total ?? 0;
+//   }
+//   return total;
+// };
+// /**
+//  *
+//  * @param {Number} partyId
+//  * @param {Number} modeOfPayment
+//  * @returns {Promise<{total: Number, totalCredit: Number, totalSettled: Number}>}
+//  */
+// const partyCreditPurchaseHistoryTotal = async (partyId, modeOfPayment) => {
+//   const data = await PurchaseModel.aggregate([
+//     {
+//       $match: {
+//         modeOfPayment: { $in: [modeOfPayment] },
+//         party: mongoose.Types.ObjectId(partyId),
+//       },
+//     },
+
+//     {
+//       $group: {
+//         _id: "$itemNumber",
+//         total: {
+//           $sum: "$total",
+//         },
+//       },
+//     },
+//   ]);
+//   let total = 0;
+//   if (!isEmpty(data)) {
+//     total = data[0].total ?? 0;
+//   }
+//   return total;
+// };
+
+
 /**
- *
  * @param {Number} partyId
- * @param {Number} modeOfPayment
+ * @param {String|Array} modeOfPayment
  * @returns {Promise<{total: Number, totalCredit: Number, totalSettled: Number}>}
  */
 const partyCreditSaleHistoryTotal = async (partyId, modeOfPayment) => {
+  const matchCondition = {
+    party: mongoose.Types.ObjectId(partyId),
+  };
+
+  if (typeof modeOfPayment === 'string') {
+    matchCondition.modeOfPayment = { $in: [modeOfPayment] };
+  } else if (Array.isArray(modeOfPayment)) {
+    matchCondition.modeOfPayment = { $in: modeOfPayment };
+  }
+
   const data = await SalesModel.aggregate([
     {
-      $match: {
-        modeOfPayment: { $in: [modeOfPayment] },
-        party: mongoose.Types.ObjectId(partyId),
-      },
+      $match: matchCondition,
     },
-
     {
       $group: {
         _id: "$itemNumber",
@@ -296,27 +439,35 @@ const partyCreditSaleHistoryTotal = async (partyId, modeOfPayment) => {
       },
     },
   ]);
+
   let total = 0;
   if (!isEmpty(data)) {
     total = data[0].total ?? 0;
   }
+
   return total;
 };
+
 /**
- *
  * @param {Number} partyId
- * @param {Number} modeOfPayment
+ * @param {String|Array} modeOfPayment
  * @returns {Promise<{total: Number, totalCredit: Number, totalSettled: Number}>}
  */
 const partyCreditPurchaseHistoryTotal = async (partyId, modeOfPayment) => {
+  const matchCondition = {
+    party: mongoose.Types.ObjectId(partyId),
+  };
+
+  if (typeof modeOfPayment === 'string') {
+    matchCondition.modeOfPayment = { $in: [modeOfPayment] };
+  } else if (Array.isArray(modeOfPayment)) {
+    matchCondition.modeOfPayment = { $in: modeOfPayment };
+  }
+
   const data = await PurchaseModel.aggregate([
     {
-      $match: {
-        modeOfPayment: { $in: [modeOfPayment] },
-        party: mongoose.Types.ObjectId(partyId),
-      },
+      $match: matchCondition,
     },
-
     {
       $group: {
         _id: "$itemNumber",
@@ -326,9 +477,11 @@ const partyCreditPurchaseHistoryTotal = async (partyId, modeOfPayment) => {
       },
     },
   ]);
+
   let total = 0;
   if (!isEmpty(data)) {
     total = data[0].total ?? 0;
   }
+
   return total;
 };
