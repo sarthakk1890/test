@@ -53,8 +53,7 @@ exports.getEstimate = catchAsyncErrors(async (req, res, next) => {
     const { estimateNum } = req.params;
 
     const estimate = await Estimate.findOne(
-        { user,  },
-        { estimateNum, },
+        { user, estimateNum },
     );
 
     // const estimate = await Estimate.findById(id);
@@ -75,8 +74,7 @@ exports.updateEstimate = catchAsyncErrors(async (req, res, next) => {
     const { estimateNum } = req.body;
 
     const updatedEstimate = await Estimate.findOneAndUpdate(
-        { user,  },
-        { estimateNum, /* add other fields to update */ },
+        { user, estimateNum },
         { new: true, runValidators: true }
     );
 
