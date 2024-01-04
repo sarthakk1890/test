@@ -99,7 +99,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
       expense,
     });
   }
-  if (type === "sale return") {
+  if (type === "saleReturn") {
     const sales = await SalesReturnModel.find({
       createdAt: { $gte: start_date, $lte: end_date },
       user: user,
