@@ -6,7 +6,6 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const moment = require('moment-timezone');
 const User = require("../models/userModel");
 
-
 //Create new Estimate 
 exports.createEstimate = catchAsyncErrors(async (req, res, next) => {
     const { orderItems, reciverName, gst, businessName, businessAddress, estimateNum } = req.body;
@@ -49,16 +48,17 @@ const calcTotalAmount = (orderItems) => {
     return total;
 };
 
-//Get single Estimate
+// Get single Estimate with product details
 exports.getEstimate = catchAsyncErrors(async (req, res, next) => {
     const user = req.user._id;
     const { estimateNum } = req.params;
 
-    const estimate = await Estimate.findOne(
-        { user, estimateNum },
-    );
-
-    // const estimate = await Estimate.findById(id);
+    const estimate = await Estimate.findOne({ user, estimateNum })
+        .populate({
+            path: 'orderItems.product',
+            model: 'inventory',
+        })
+        .exec();
 
     if (!estimate) {
         return next(new ErrorHandler("Estimate not found", 404));
@@ -70,14 +70,14 @@ exports.getEstimate = catchAsyncErrors(async (req, res, next) => {
     });
 });
 
+
 //Update Estimate
 exports.updateEstimate = catchAsyncErrors(async (req, res, next) => {
     const user = req.user._id;
-    const { estimateNum } = req.params;
+    const { estimateNum } = req.body;
 
     const updatedEstimate = await Estimate.findOneAndUpdate(
         { user, estimateNum },
-        req.body,
         { new: true, runValidators: true }
     );
 
