@@ -49,15 +49,15 @@ const calcTotalAmount = (orderItems) => {
 
 //Get single Estimate
 exports.getEstimate = catchAsyncErrors(async (req, res, next) => {
-
     const user = req.user._id;
     const { estimateNum } = req.body;
 
-    const estimate = await Estimate.findOneAndUpdate(
-        { user, },
+    const estimate = await Estimate.findOne(
+        { user,  },
         { estimateNum, },
-        { new: true, runValidators: true }
     );
+
+    // const estimate = await Estimate.findById(id);
 
     if (!estimate) {
         return next(new ErrorHandler("Estimate not found", 404));
@@ -71,13 +71,12 @@ exports.getEstimate = catchAsyncErrors(async (req, res, next) => {
 
 //Update Estimate
 exports.updateEstimate = catchAsyncErrors(async (req, res, next) => {
-    const { id } = req.params;
+    const user = req.user._id;
     const { estimateNum } = req.body;
 
-    const updatedEstimate = await Estimate.findByIdAndUpdate(
-        id,
-        estimateNum,
-        req.body,
+    const updatedEstimate = await Estimate.findOneAndUpdate(
+        { user,  },
+        { estimateNum, /* add other fields to update */ },
         { new: true, runValidators: true }
     );
 
