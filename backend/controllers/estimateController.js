@@ -6,6 +6,7 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const moment = require('moment-timezone');
 const User = require("../models/userModel");
 
+
 //Create new Estimate 
 exports.createEstimate = catchAsyncErrors(async (req, res, next) => {
     const { orderItems, reciverName, gst, businessName, businessAddress, estimateNum } = req.body;
@@ -78,6 +79,7 @@ exports.updateEstimate = catchAsyncErrors(async (req, res, next) => {
 
     const updatedEstimate = await Estimate.findOneAndUpdate(
         { user, estimateNum },
+        req.body,
         { new: true, runValidators: true }
     );
 
