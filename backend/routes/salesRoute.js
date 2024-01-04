@@ -29,9 +29,14 @@ router
   .route("/sales/credit-history/:id")
   .get(isAuthenticatedUser, cntrl.partyCreditHistory)
   .post(isAuthenticatedUser, cntrl.addCreditSettleTransaction);
+
+// router
+//   .route("/salesOrder/:id")
+//   .get(isAuthenticatedUser, getSingleSalesOrder);
 router
-  .route("/salesOrder/:id")
+  .route("/salesOrder/:invoiceNum")
   .get(isAuthenticatedUser, getSingleSalesOrder);
+
 router
   .route("/sales/credit")
   .get(isAuthenticatedUser, getCreditSaleOrders);
