@@ -18,7 +18,6 @@ router.route("/estimate/update")
 router.route("/estimate/:estimateNum")
 .get(isAuthenticatedUser, getEstimate)
 
-
 router.route("/estimatesNum")
   .get(isAuthenticatedUser, getNumberofEstimates)
   .put(isAuthenticatedUser, resetEstimatesCount)
