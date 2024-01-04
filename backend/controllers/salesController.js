@@ -85,11 +85,14 @@ const calcTotalAmount = (orderItems) => {
 
 // get Single sales Order
 exports.getSingleSalesOrder = catchAsyncErrors(async (req, res, next) => {
-  const invoiceNum = req.params.id;
-  const salesOrder = await SalesOrder.findOne({invoiceNum}).populate(
-    "user",
-    "name email"
-  );
+  const { invoiceNum } = req.params;
+  const salesOrder = await SalesOrder.findOne({ invoiceNum })
+    .populate("user", "name email")
+    .populate({
+      path: 'orderItems.product',
+      model: 'inventory',
+    })
+    .exec();;
 
   if (!salesOrder) {
     return next(new ErrorHandler("Order not found with this Id", 404));
