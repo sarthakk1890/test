@@ -110,7 +110,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
       },
       "party",
       { path: "user", select: "taxFile" },
-    ]);
+    ]).select("-modeOfPayment");
 
     console.log(sales);
     res.status(200).json({
