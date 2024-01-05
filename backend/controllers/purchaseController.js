@@ -237,7 +237,8 @@ exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
   const data = await PurchaseOrder.find({
     party: id
-  }).sort({ createdAt: -1 });
+  }).sort({ createdAt: -1 })
+    .populate('party');
 
   data.map((value, idx) => {
     if (!value.modeOfPayment[0].mode) {
