@@ -11,9 +11,9 @@ router.route("/estimate/new").post(isAuthenticatedUser, createEstimate);
 
 router.route("/estimate/:id")
 .post(isAuthenticatedUser, convertEstimateToSalesOrder);
+.put(isAuthenticatedUser, updateEstimate)
 
 router.route("/estimate/:estimateNum")
-.put(isAuthenticatedUser, updateEstimate)
 .get(isAuthenticatedUser, getEstimate)
 
 router.route("/estimatesNum")
