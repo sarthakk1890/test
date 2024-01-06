@@ -100,11 +100,11 @@ exports.updateEstimate = catchAsyncErrors(async (req, res, next) => {
 //Convert estimate to sales
 exports.convertEstimateToSalesOrder = catchAsyncErrors(async (req, res, next) => {
 
-    const { id: estimateId } = req.params;
+    const { id: estimateNum } = req.params;
 
     const { modeOfPayment, invoiceNum, party } = req.body;
 
-    const estimate = await Estimate.findById(estimateId);
+    const estimate = await Estimate.findOne({estimateNum, user: req.user._id});
     if (!estimate) {
         return next(new ErrorHandler("Estimate not found", 404));
     }
