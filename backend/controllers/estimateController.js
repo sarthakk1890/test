@@ -77,7 +77,7 @@ exports.updateEstimate = catchAsyncErrors(async (req, res, next) => {
     const user = req.user._id;
     const { id } = req.params;
 
-    const updatedEstimate = await Estimate.findOneAndUpdate(
+    const updatedEstimate = await Estimate.findByIdAndUpdate(
         id,
         req.body,
         { new: true, runValidators: true }
