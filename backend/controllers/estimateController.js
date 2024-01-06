@@ -152,7 +152,7 @@ exports.convertEstimateToSalesOrder = catchAsyncErrors(async (req, res, next) =>
     });
 
     // Delete the estimate after creating the sales order
-    await Estimate.findByIdAndDelete(estimateId);
+    await Estimate.findByIdAndDelete(estimate._id);
 
     res.status(201).json({
         success: true,
