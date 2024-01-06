@@ -151,6 +151,9 @@ exports.convertEstimateToSalesOrder = catchAsyncErrors(async (req, res, next) =>
         invoiceNum
     });
 
+     // Increment numSales in User model
+    await User.findByIdAndUpdate(req.user._id, { $inc: { numSales: 1 } });
+
     // Delete the estimate after creating the sales order
     await Estimate.findByIdAndDelete(estimateId);
 
