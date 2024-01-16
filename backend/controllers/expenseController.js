@@ -1,11 +1,15 @@
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const ExpenseModel = require("../models/expenseModel");
+const moment = require('moment-timezone');
 
 exports.addExpense = catchAsyncErrors(async (req, res, next) => {
   // const income=req.body;
   const userDetails = req.user._id;
   req.body.user = userDetails;
+
+  const indiaTime = moment.tz('Asia/Kolkata');
+  req.body.createdAt = indiaTime.format('YYYY-MM-DD HH:mm:ss');
 
   const expense = await ExpenseModel.create(req.body);
 
