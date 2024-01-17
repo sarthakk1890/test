@@ -26,10 +26,13 @@ const expenseSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
-  
+
+  date:{
+    type: String
+  },
+
   createdAt: {
-    type: String | Date,
-    // default: Date.now,
+    type: Date,
   },
 });
 
