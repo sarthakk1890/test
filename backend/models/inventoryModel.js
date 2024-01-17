@@ -42,6 +42,13 @@ const inventorySchema = mongoose.Schema(
       // required: [true, "Please Enter selling price of inventory"],
       maxLength: [8, "Price cannot exceed 8 characters"],
     },
+
+    //------Added MRP--------------
+    mrp:{
+      type: Number,
+      required: false
+    },
+
     returnPeriod: {
       type: Number,
       default: 0,

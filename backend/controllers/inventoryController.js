@@ -282,6 +282,7 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     available,
     expiryDate,
     hsn,
+    mrp,
   } = req.body;
 
   if (quantity < 1) {
@@ -349,6 +350,7 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     expiryDate,
     hsn,
     GSTincluded,
+    mrp,
   };
 
   Object.keys(fieldsToUpdate).forEach(key => {

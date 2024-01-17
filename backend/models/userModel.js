@@ -141,6 +141,13 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0
     },
+
+    //--------Added dlNum--------
+    dlNum:{
+      type: String,
+      required: false
+    },
+
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },
