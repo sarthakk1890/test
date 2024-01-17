@@ -8,9 +8,9 @@ exports.addExpense = catchAsyncErrors(async (req, res, next) => {
   const userDetails = req.user._id;
   req.body.user = userDetails;
 
-  const indiaTime = moment.tz('Asia/Kolkata');
-  const currentDateTimeInIndia = indiaTime.format();
-  console.log(currentDateTimeInIndia);
+  // const indiaTime = moment.tz('Asia/Kolkata');
+  // const currentDateTimeInIndia = indiaTime.format();
+  // console.log(currentDateTimeInIndia);
 
   const expense = await ExpenseModel.create(req.body);
 
