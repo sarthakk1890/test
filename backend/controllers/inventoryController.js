@@ -86,6 +86,13 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
 //Uploading Image
 exports.addInventoryImage = catchAsyncErrors(async (req, res, next) => {
   const { inventoryId } = req.body;
+  if (!req.files || !req.files.image) {
+    return res.status(400).json({
+      success: false,
+      msg: "No image found",
+    });
+  }
+
   if (req.files?.image) {
     const result = await uploadImage(req.files.image);
     req.body.image = result.url;
@@ -97,7 +104,7 @@ exports.addInventoryImage = catchAsyncErrors(async (req, res, next) => {
     });
   }
 
-  const updatedInventory = await Inventory.findByIdAndUpdate(inventoryId, { image: req.body.image });
+  const updatedInventory = await Inventory.findByIdAndUpdate(inventoryId, { image: req.body.image }, { new: true, runValidators: true });
 
   if (!updatedInventory) {
     return res.status(400).json({
@@ -110,7 +117,6 @@ exports.addInventoryImage = catchAsyncErrors(async (req, res, next) => {
     success: true,
     updatedInventory
   });
-
 })
 
 // Get All Inventory count and search
