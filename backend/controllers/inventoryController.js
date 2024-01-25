@@ -55,14 +55,9 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     req.body.quantity = 99999;
   }
 
-  if (req.files?.image) {
-    const result = await uploadImage(req.files.image);
-    req.body.image = result.url;
-  }
-
   req.body.user = userDetail;
 
-  if (barCode !== undefined && barCode !== "" && barCode.length !== 0) {
+  if (barCode !== undefined && barCode !== "") {
     const existingInventory = await Inventory.findOne({
       barCode: barCode,
       user: req.user._id,
@@ -88,6 +83,35 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+//Uploading Image
+exports.addInventoryImage = catchAsyncErrors(async (req, res, next) => {
+  const { inventoryId } = req.body;
+  if (req.files?.image) {
+    const result = await uploadImage(req.files.image);
+    req.body.image = result.url;
+  }
+  else {
+    return res.status(400).json({
+      success: false,
+      msg: "No image found",
+    });
+  }
+
+  const updatedInventory = await Inventory.findByIdAndUpdate(inventoryId, { image: req.body.image });
+
+  if (!updatedInventory) {
+    return res.status(400).json({
+      success: false,
+      msg: "Product with this ID not found",
+    });
+  }
+
+  res.status(201).json({
+    success: true,
+    updatedInventory
+  });
+
+})
 
 // Get All Inventory count and search
 exports.getAllInventoriesAndSearch1 = catchAsyncErrors(async (req, res, next) => {

@@ -11,7 +11,8 @@ const {
   findInventoryByBarcode,
   bulkUpload,
   availablility,
-  updateExistingInventories // Add this line
+  updateExistingInventories, // Add this line
+  addInventoryImage
 } = require("../controllers/inventoryController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
 
@@ -30,6 +31,7 @@ router
 router.route("/inventories/all").get(isAuthenticatedUser, getAllInventories);
 
 router.route("/inventory/new").post(isAuthenticatedUser, createInventory);
+router.route("/inventory/image").post(isAuthenticatedUser, addInventoryImage);
 
 router.route("/inventory/bulk").post(upload.single('excelFile'), bulkUpload);
 
