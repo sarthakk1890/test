@@ -83,16 +83,38 @@ const calcTotalAmount = (orderItems) => {
   return total;
 };
 
-// get Single sales Order
+// // get Single sales Order
+// exports.getSingleSalesOrder = catchAsyncErrors(async (req, res, next) => {
+//   const { invoiceNum } = req.params;
+//   const salesOrder = await SalesOrder.findOne({ invoiceNum })
+//     .populate("user", "name email")
+//     .populate({
+//       path: 'orderItems.product',
+//       model: 'inventory',
+//     })
+//     .exec();;
+
+//   if (!salesOrder) {
+//     return next(new ErrorHandler("Order not found with this Id", 404));
+//   }
+
+//   res.status(200).json({
+//     success: true,
+//     salesOrder,
+//   });
+// });
 exports.getSingleSalesOrder = catchAsyncErrors(async (req, res, next) => {
   const { invoiceNum } = req.params;
-  const salesOrder = await SalesOrder.findOne({ invoiceNum })
+  const userId = req.user._id;
+  // console.log(req.user);
+
+  const salesOrder = await SalesOrder.findOne({ invoiceNum, 'user': userId })
     .populate("user", "name email")
     .populate({
       path: 'orderItems.product',
       model: 'inventory',
     })
-    .exec();;
+    .exec();
 
   if (!salesOrder) {
     return next(new ErrorHandler("Order not found with this Id", 404));
