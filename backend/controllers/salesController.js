@@ -20,25 +20,42 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
 
   for (const item of orderItems) {
     const product = await Inventory.findById(item.product);
+
     if (!product) {
       return next(new ErrorHandler("Product not found", 404));
+    }
+
+    // Reduce subproduct quantities
+    if (product.subProducts && product.subProducts.length > 0) {
+      for (const subProduct of product.subProducts) {
+        const subProductItem = await Inventory.findById(subProduct.inventoryId);
+
+        if (subProductItem) {
+          // Calculate the quantity to reduce for the subProduct
+          const subProductReduction = item.quantity * subProduct.quantity;
+
+          if (subProductReduction > subProductItem.quantity) {
+            console.error(`Insufficient quantity for ${subProductItem.name}`);
+          } else {
+            // Reduce the quantity of the subProduct
+            subProductItem.quantity -= subProductReduction;
+            await subProductItem.save();
+          }
+        }
+      }
+    }
+
+    // Check if there is enough quantity for the main product
+    if (item.quantity > product.quantity) {
+      return next(new ErrorHandler(`Insufficient quantity for ${product.name}`, 400));
     }
 
     // Reduce main product quantity
     product.quantity -= item.quantity;
     await product.save();
 
-    // Reduce subproduct quantities
-    if (product.subProducts && product.subProducts.length > 0) {
-      for (const subProduct of product.subProducts) {
-        const subProductItem = await Inventory.findById(subProduct.inventoryId);
-        if (subProductItem) {
-          subProductItem.quantity -= subProduct.quantity;
-          await subProductItem.save();
-        }
-      }
-    }
   }
+
 
   try {
     const total = calcTotalAmount(orderItems);
@@ -322,7 +339,7 @@ exports.salesReturn = catchAsyncErrors(async (req, res, next) => {
     if (!product) {
       return next(new ErrorHandler("Product not found", 404));
     }
-    
+
     // Increase main product quantity
     product.quantity += item.quantity;
 

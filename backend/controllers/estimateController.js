@@ -113,10 +113,12 @@ exports.convertEstimateToSalesOrder = catchAsyncErrors(async (req, res, next) =>
 
     for (const item of orderItems) {
         const product = await Inventory.findById(item.product);
+
         if (!product) {
             return next(new ErrorHandler("Product not found", 404));
         }
 
+        // Reduce main product quantity
         product.quantity -= item.quantity;
         await product.save();
 
@@ -124,13 +126,24 @@ exports.convertEstimateToSalesOrder = catchAsyncErrors(async (req, res, next) =>
         if (product.subProducts && product.subProducts.length > 0) {
             for (const subProduct of product.subProducts) {
                 const subProductItem = await Inventory.findById(subProduct.inventoryId);
+
                 if (subProductItem) {
-                    subProductItem.quantity -= subProduct.quantity;
-                    await subProductItem.save();
+                    // Calculate the quantity to reduce for the subProduct
+                    const subProductReduction = item.quantity * subProduct.quantity;
+
+                    // Check if there is enough quantity to reduce for the subProduct
+                    if (subProductReduction > subProductItem.quantity) {
+                        console.error(`Insufficient quantity for ${subProductItem.name}`);
+                    } else {
+                        // Reduce the quantity of the subProduct
+                        subProductItem.quantity -= subProductReduction;
+                        await subProductItem.save();
+                    }
                 }
             }
         }
     }
+
 
     // Convert modeOfPayment to an array if it is a string
     const paymentArray = typeof modeOfPayment === 'string'
@@ -151,7 +164,7 @@ exports.convertEstimateToSalesOrder = catchAsyncErrors(async (req, res, next) =>
         invoiceNum
     });
 
-     // Increment numSales in User model
+    // Increment numSales in User model
     await User.findByIdAndUpdate(req.user._id, { $inc: { numSales: 1 } });
 
     // Delete the estimate after creating the sales order
