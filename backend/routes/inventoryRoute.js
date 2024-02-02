@@ -11,7 +11,7 @@ const {
   findInventoryByBarcode,
   bulkUpload,
   availablility,
-  updateExistingInventories, // Add this line
+  updateExistingInventories,
   addInventoryImage
 } = require("../controllers/inventoryController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
