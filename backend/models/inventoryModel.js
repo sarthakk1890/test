@@ -159,8 +159,12 @@ const inventorySchema = mongoose.Schema(
     },
     hsn: {
       type: String,
-
     },
+
+    //Added unit
+    unit:{
+      type: String,
+      required: false
   },
   { timestamps: true }
 );
