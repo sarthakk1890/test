@@ -165,6 +165,7 @@ const inventorySchema = mongoose.Schema(
     unit:{
       type: String,
       required: false
+    }
   },
   { timestamps: true }
 );
