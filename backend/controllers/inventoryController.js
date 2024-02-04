@@ -357,6 +357,7 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     sellingPrice,
     barCode,
     quantity,
+    subProducts,
     GSTRate,
     saleSGST,
     saleCGST,
@@ -381,34 +382,6 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
       inventory[key] = fieldsToUpdate[key];
     }
   });
-
-  // Handle subProducts update
-  if (subProducts && Array.isArray(subProducts)) {
-    subProducts.forEach((subProduct) => {
-      const { name: subProductName, inventoryId, quantity: subProductQuantity } = subProduct;
-
-      const existingSubProductIndex = inventory.subProducts.findIndex(
-        (sp) => sp.inventoryId.toString() === inventoryId
-      );
-
-      if (existingSubProductIndex !== -1) {
-        // Update existing subProduct
-        if (subProductQuantity) {
-          inventory.subProducts[existingSubProductIndex].quantity = subProductQuantity;
-        }
-        if (subProductName) {
-          inventory.subProducts[existingSubProductIndex].name = subProductName;
-        }
-      } else {
-        // Add new subProduct
-        inventory.subProducts.push({
-          name: subProductName,
-          inventoryId,
-          quantity: subProductQuantity,
-        });
-      }
-    });
-  }
 
   // Save the updated inventory
   inventory = await inventory.save();
