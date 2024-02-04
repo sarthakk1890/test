@@ -314,6 +314,7 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     expiryDate,
     hsn,
     mrp,
+    batchNumber,
     unit
   } = req.body;
 
@@ -373,6 +374,7 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     expiryDate,
     hsn,
     GSTincluded,
+    batchNumber,
     mrp,
     unit
   };
