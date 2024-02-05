@@ -260,19 +260,41 @@ exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// exports.updatePurchaseOrders = catchAsyncErrors(async (req, res, next) => {
+//   const data = await PurchaseOrder.findByIdAndUpdate({ _id: req.params.id }, req.body).clone()
+//     .then(() => {
+//       PurchaseOrder.findById(req.params.id).then((data) => {
+//         res.status(200).json({
+//           success: true,
+//           data,
+//         });
+//       });
+//     }).catch(err => {
+//       ErrorHandler(err);
+//     });
+// });
+
 exports.updatePurchaseOrders = catchAsyncErrors(async (req, res, next) => {
-  const data = await PurchaseOrder.findByIdAndUpdate({ _id: req.params.id }, req.body).clone()
-    .then(() => {
-      PurchaseOrder.findById(req.params.id).then((data) => {
-        res.status(200).json({
-          success: true,
-          data,
-        });
-      });
-    }).catch(err => {
-      ErrorHandler(err);
-    });
+  const { total } = req.body;
+
+  // Update the main document and set the amount field in the modeOfPayment array to total
+  const updatedPurchaseOrder = await PurchaseOrder.findByIdAndUpdate(
+    { _id: req.params.id },
+    {
+      $set: {
+        total,
+        'modeOfPayment.$.amount': total,
+      },
+    },
+    { new: true } // Return the updated document
+  );
+
+  res.status(200).json({
+    success: true,
+    data: updatedPurchaseOrder,
+  });
 });
+
 
 
 //Get number of purchase
