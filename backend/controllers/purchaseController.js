@@ -278,16 +278,13 @@ exports.updatePurchaseOrders = catchAsyncErrors(async (req, res, next) => {
   const { total } = req.body;
 
   // Update the main document and set the amount field in the modeOfPayment array to total
-  const updatedPurchaseOrder = await PurchaseOrder.findByIdAndUpdate(
-    { _id: req.params.id },
-    {
-      $set: {
-        total,
-        'modeOfPayment.$.amount': total,
-      },
-    },
-    { new: true } // Return the updated document
-  );
+  const purchaseOrder = await PurchaseOrder.findById(req.params.id)
+
+  purchaseOrder.total = total;
+  purchaseOrder.modeOfPayment[0].amount = total;
+
+  const updatedPurchaseOrder = await purchaseOrder.save();
+  
 
   res.status(200).json({
     success: true,
