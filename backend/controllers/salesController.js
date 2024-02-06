@@ -307,16 +307,12 @@ exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
 exports.UpdateSalesOrder = catchAsyncErrors(async (req, res, next) => {
   const { total } = req.body;
 
-  const updatedSalesOrder = await SalesOrder.findByIdAndUpdate(
-    { _id: req.params.id },
-    {
-      $set: {
-        total,
-        'modeOfPayment.$.amount': total,
-      },
-    },
-    { new: true }
-  );
+  const salesOrder = await SalesOrder.findById(req.params.id);
+
+  salesOrder.modeOfPayment[0].amount = total;
+  salesOrder.total = total;
+
+  const updatedSalesOrder = await salesOrder.save();
 
   res.status(200).json({
     success: true,
