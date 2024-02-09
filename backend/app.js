@@ -215,6 +215,9 @@ const forceUpdate = require("./routes/forceUpdateRoute");
 
 const estimate = require("./routes/estimateRoute");
 
+const kot = require("./routes/kotRoute");
+
+
 const corsConfig = {
   origin: "http://localhost:5500",
   credentials: true,
@@ -288,8 +291,9 @@ app.use("/api/v1", bulk);
 app.use("/api/v1", table);
 app.use("/api/v1", getShopRating);
 app.use("/api/v1", forceUpdate);
-app.use("/api/v1",invoice);
+app.use("/api/v1", invoice);
 app.use("/api/v1", estimate);
+app.use("/api/v1", kot);
 
 app.use(express.static(path.join(__dirname, "build")));
 
