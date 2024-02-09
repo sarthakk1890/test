@@ -40,6 +40,22 @@ exports.getKot = catchAsyncErrors(async (req, res, next) => {
 
 })
 
+//get single KOT
+exports.getSingleKot = catchAsyncErrors(async (req, res, next) => {
+    const { id } = req.params;
+
+    const kot = await KOT.findById(id);
+
+    if (!kot) {
+        return next(new ErrorHandler("KOT not found", 404));
+    }
+
+    res.status(201).json({
+        success: true,
+        kot
+    })
+})
+
 //Update the KOT
 exports.updateKot = catchAsyncErrors(async (req, res, next) => {
 
