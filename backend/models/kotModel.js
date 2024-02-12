@@ -23,7 +23,7 @@ const itemDetails = mongoose.Schema({
    baseSellingPrice: {
       type: Number,
    },
-   discountAmt:{
+   discountAmt: {
       type: Number,
    },
    createdAt: {
@@ -33,6 +33,9 @@ const itemDetails = mongoose.Schema({
 })
 
 const kotSchema = mongoose.Schema({
+   kotId: {
+      type: String
+   },
    item: {
       type: [itemDetails]
    },

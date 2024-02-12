@@ -44,7 +44,7 @@ exports.getKot = catchAsyncErrors(async (req, res, next) => {
 exports.getSingleKot = catchAsyncErrors(async (req, res, next) => {
     const { id } = req.params;
 
-    const kot = await KOT.findById(id);
+    const kot = await KOT.findOne({ kotId: id });
 
     if (!kot) {
         return next(new ErrorHandler("KOT not found", 404));
@@ -63,7 +63,7 @@ exports.updateKot = catchAsyncErrors(async (req, res, next) => {
     const { item } = req.body;
 
     const updatedKOT = await KOT.findOneAndUpdate(
-        { _id: kotId },
+        { kotId },
         { $push: { item: { $each: item } } },
         { new: true }
     );
@@ -72,5 +72,4 @@ exports.updateKot = catchAsyncErrors(async (req, res, next) => {
         success: true,
         updatedKOT,
     });
-
 })
