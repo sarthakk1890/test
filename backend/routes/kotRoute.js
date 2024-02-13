@@ -13,7 +13,7 @@ router.get("/kot/:id", isAuthenticatedUser, getSingleKot);
 
 //----Billing Order Routes------------
 router.post("/billingorder/new", isAuthenticatedUser, createBillingOrder);
-router.get("billingorder/all", isAuthenticatedUser, getBillingOrder);
-router.put("billingorder/:id", isAuthenticatedUser, updateBillingOrder)
+router.get("/billingorder/all", isAuthenticatedUser, getBillingOrder);
+router.put("/billingorder/:id", isAuthenticatedUser, updateBillingOrder)
 
 module.exports = router;
