@@ -44,7 +44,7 @@ exports.getBillingOrder = catchAsyncErrors(async (req, res, next) => {
 //Update the BillingOrder
 exports.updateBillingOrder = catchAsyncErrors(async (req, res, next) => {
 
-    const { kotId } = req.params.id;
+    const { kotId } = req.params;
     const updatedFields = req.body;
 
     const updatedBillingOrder = await BillingOrder.findOneAndUpdate(
