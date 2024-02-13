@@ -41,22 +41,6 @@ exports.getBillingOrder = catchAsyncErrors(async (req, res, next) => {
 
 })
 
-//get single KOT
-// exports.getSingleKot = catchAsyncErrors(async (req, res, next) => {
-//     const { id } = req.params;
-
-//     const kot = await KOT.findOne({ kotId: id });
-
-//     if (!kot) {
-//         return next(new ErrorHandler("KOT not found", 404));
-//     }
-
-//     res.status(201).json({
-//         success: true,
-//         kot
-//     })
-// })
-
 //Update the BillingOrder
 exports.updateBillingOrder = catchAsyncErrors(async (req, res, next) => {
     const id = req.params.id;
