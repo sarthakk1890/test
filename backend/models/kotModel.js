@@ -9,23 +9,6 @@ const itemDetails = mongoose.Schema({
       type: Number,
       // required: true
    },
-   saleSGST: {
-      type: Number,
-      maxLength: [10, "SGST Rate cannot exceed 5 characters"],
-   },
-   saleCGST: {
-      type: Number,
-      maxLength: [10, "CGST Rate cannot exceed 5 characters"],
-   },
-   saleIGST: {
-      type: Number,
-   },
-   baseSellingPrice: {
-      type: Number,
-   },
-   discountAmt: {
-      type: Number,
-   },
    createdAt: {
       type: String,
       required: true
