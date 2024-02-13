@@ -109,10 +109,6 @@ const itemDetails = mongoose.Schema({
     },
     originalbaseSellingPrice: {
         type: Number,
-    },
-    createdAt: {
-        type: String,
-        required: true
     }
 })
 
