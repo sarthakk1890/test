@@ -10,7 +10,7 @@ router.post("/kot/new", isAuthenticatedUser, createKot);
 router.get("/kot/all", isAuthenticatedUser, getKot);
 router.put("/kot/:id", isAuthenticatedUser, updateKot);
 router.get("/kot/:id", isAuthenticatedUser, getSingleKot);
-router.delete("/kot/:kotId", isAuthenticatedUser, deletekot);
+router.delete("/kot/:id", isAuthenticatedUser, deletekot);
 
 //----Billing Order Routes------------
 router.post("/billingorder/new", isAuthenticatedUser, createBillingOrder);
