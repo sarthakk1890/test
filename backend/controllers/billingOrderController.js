@@ -32,7 +32,12 @@ exports.getBillingOrder = catchAsyncErrors(async (req, res, next) => {
 
     const user = req.user._id;
 
-    const allBillingOrder = await BillingOrder.find({ user }).populate('user').populate('Product');
+    const allBillingOrder = await BillingOrder.find({ user })
+        .populate('user')
+        .populate({
+            path: 'orderItems.product.inventory',
+            model: 'inventory',
+        })
 
     res.status(201).json({
         success: true,
@@ -52,7 +57,12 @@ exports.updateBillingOrder = catchAsyncErrors(async (req, res, next) => {
         { kotId, user },
         updatedFields,
         { new: true }
-    ).populate('user').populate('Product');
+    )
+        .populate('user')
+        .populate({
+            path: 'orderItems.product.inventory',
+            model: 'inventory',
+        });
 
     if (!updatedBillingOrder) {
         return res.status(404).json({
