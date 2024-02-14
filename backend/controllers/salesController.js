@@ -289,7 +289,6 @@ exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
     return item.modeOfPayment.some(payment => ["Credit", "Settle"].includes(payment.mode));
   });
 
-
   // Print the retrieved data for debugging
   console.log("Retrieved Sales Order Data:", elementsWithCredit);
 

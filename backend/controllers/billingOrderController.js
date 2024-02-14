@@ -32,7 +32,7 @@ exports.getBillingOrder = catchAsyncErrors(async (req, res, next) => {
 
     const user = req.user._id;
 
-    const allBillingOrder = await BillingOrder.find({ user }).populate('user');
+    const allBillingOrder = await BillingOrder.find({ user }).populate('user').populate('Product');
 
     res.status(201).json({
         success: true,
@@ -52,7 +52,7 @@ exports.updateBillingOrder = catchAsyncErrors(async (req, res, next) => {
         { kotId, user },
         updatedFields,
         { new: true }
-    ).populate('user');
+    ).populate('user').populate('Product');
 
     if (!updatedBillingOrder) {
         return res.status(404).json({
