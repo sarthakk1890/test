@@ -43,8 +43,9 @@ exports.getKot = catchAsyncErrors(async (req, res, next) => {
 //get single KOT
 exports.getSingleKot = catchAsyncErrors(async (req, res, next) => {
     const { id } = req.params;
+    const user = req.user._id
 
-    const kot = await KOT.findOne({ kotId: id });
+    const kot = await KOT.findOne({ kotId: id, user });
 
     if (!kot) {
         return next(new ErrorHandler("KOT not found", 404));
@@ -60,10 +61,11 @@ exports.getSingleKot = catchAsyncErrors(async (req, res, next) => {
 exports.updateKot = catchAsyncErrors(async (req, res, next) => {
 
     const kotId = req.params.id;
+    const user = req.user._id;
     const { item } = req.body;
 
     const updatedKOT = await KOT.findOneAndUpdate(
-        { kotId },
+        { kotId, user },
         { $push: { item: { $each: item } } },
         { new: true }
     );
@@ -72,4 +74,26 @@ exports.updateKot = catchAsyncErrors(async (req, res, next) => {
         success: true,
         updatedKOT,
     });
+})
+
+
+//Delete the KOT
+exports.deletekot = catchAsyncErrors(async (req, res, next) => {
+    const { kotId } = req.params;
+    const user = req.user._id
+
+    const deletedKOT = await KOT.findOneAndDelete({ kotId, user });
+
+    if (!deletedKOT) {
+        return res.status(404).json({
+            success: false,
+            message: 'KOT not found'
+        });
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "KOT Deleted successfully",
+    });
+
 })

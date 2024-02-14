@@ -46,9 +46,10 @@ exports.updateBillingOrder = catchAsyncErrors(async (req, res, next) => {
 
     const { kotId } = req.params;
     const updatedFields = req.body;
+    const user = req.user._id
 
     const updatedBillingOrder = await BillingOrder.findOneAndUpdate(
-        kotId,
+        { kotId, user },
         updatedFields,
         { new: true }
     ).populate('user');
@@ -65,3 +66,25 @@ exports.updateBillingOrder = catchAsyncErrors(async (req, res, next) => {
         updatedBillingOrder,
     });
 });
+
+
+//Delete the billingOrder
+exports.deleteBillingOrder = catchAsyncErrors(async (req, res, next) => {
+    const { kotId } = req.params;
+    const user = req.user._id
+
+    const deletedBillingOrder = await BillingOrder.findOneAndDelete({ kotId, user });
+
+    if (!deletedBillingOrder) {
+        return res.status(404).json({
+            success: false,
+            message: 'Billing order not found'
+        });
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Billing Order Deleted successfully",
+    });
+
+})
