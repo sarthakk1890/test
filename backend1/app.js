@@ -10,8 +10,6 @@ const cors = require("cors");
 const multer = require("multer");
 var busboy = require("connect-busboy");
 const Inventory = require("./models/inventoryModel");
-const moment = require("moment-timezone");
-
 // const passport = require('passport');
 // const passportLocal = require('./config/passport-local-strategy');
 // const fs=require("fs");
@@ -296,17 +294,6 @@ app.use("/api/v1", forceUpdate);
 app.use("/api/v1", invoice);
 app.use("/api/v1", estimate);
 app.use("/api/v1", kot);
-
-//Getting current date route
-app.get('/api/v1/current-date', (req, res) => {
-  // Get current date and time in Indian Standard Time (IST)
-  const currentIST = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
-
-  res.status(200).json({
-    success: true,
-    date: currentIST
-  });
-})
 
 app.use(express.static(path.join(__dirname, "build")));
 
