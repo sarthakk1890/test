@@ -205,19 +205,16 @@ const expense = require("./routes/expenseRoute");
 const report = require("./routes/reportRoute");
 const table = require("./routes/tableRoute");
 const invoice = require("./routes/invoice")
-
 const consumer = require("./routes/consumerRoute");
-
 const payment = require("./routes/paymentRoutes");
 const subscribedUsersModel = require("./models/subscribedUsersModel");
 const agent = require("./routes/agentRoutes");
 const bulk = require("./routes/bulkUploads");
 const getShopRating = require("./routes/getShopRatingRoute");
 const forceUpdate = require("./routes/forceUpdateRoute");
-
 const estimate = require("./routes/estimateRoute");
-
 const kot = require("./routes/kotRoute");
+const subscription = require('./routes/subscriptionRoute');
 
 
 const corsConfig = {
@@ -296,6 +293,7 @@ app.use("/api/v1", forceUpdate);
 app.use("/api/v1", invoice);
 app.use("/api/v1", estimate);
 app.use("/api/v1", kot);
+app.use("/api/v1/subscription", subscription);
 
 //Getting current date route
 app.get('/api/v1/current-date', (req, res) => {

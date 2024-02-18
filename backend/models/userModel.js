@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       // required: true,
     },
-    discount:{
+    discount: {
       type: Number,
       default: 0
     },
@@ -122,30 +122,40 @@ const userSchema = new mongoose.Schema(
       default: true,
     },
 
-    pin:{
+    pin: {
       type: Number
     },
-    isPin:{
+    isPin: {
       type: Boolean,
       default: false
     },
-    numSales:{
+    numSales: {
       type: Number,
       default: 0,
     },
-    numPurchases:{
+    numPurchases: {
       type: Number,
       default: 0,
     },
-    numEstimates:{
+    numEstimates: {
       type: Number,
       default: 0
     },
 
     //--------Added dlNum--------
-    dlNum:{
+    dlNum: {
       type: String,
       required: false
+    },
+
+    //------------Adding Subscription details-------------
+    subscription_status: {
+      type: String,
+      enum: ["Active", "Inactive"]
+    },
+
+    subscription_id: {
+      type: String
     },
 
     resetPasswordToken: String,
