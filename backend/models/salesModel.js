@@ -184,8 +184,7 @@ const salesSchema = new mongoose.Schema({
     type: String,
   },
   kotId: {
-    type: mongoose.Schema.ObjectId,
-    ref: 'kotModel'
+    type: String,
   }
 });
 

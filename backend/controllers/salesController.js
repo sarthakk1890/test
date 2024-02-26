@@ -131,7 +131,6 @@ exports.getSingleSalesOrder = catchAsyncErrors(async (req, res, next) => {
       path: 'orderItems.product',
       model: 'inventory',
     })
-    .populate("kotId ")
     .exec();
 
   if (!salesOrder) {
@@ -154,7 +153,6 @@ exports.mySalesOrders = catchAsyncErrors(async (req, res, next) => {
     .limit(10)
     .skip(offset)
     .sort({ createdAt: -1 })
-    .populate("kotId ")
     .populate("party");
 
   const meta = {
