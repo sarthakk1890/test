@@ -145,7 +145,7 @@ const salesSchema = new mongoose.Schema({
       },
     },
   ],
-  
+
   modeOfPayment: [paymentModeSchema],
 
   total: {
@@ -183,6 +183,10 @@ const salesSchema = new mongoose.Schema({
   gst: {
     type: String,
   },
+  kot: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'kotModel'
+  }
 });
 
 module.exports = mongoose.model("salesModel", salesSchema);
