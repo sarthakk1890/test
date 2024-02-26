@@ -12,7 +12,7 @@ exports.createSubscription = catchAsyncErrors(async (req, res, next) => {
             plan_id: process.env.RAZORPAY_SUBSCRIPTION_PLAN_ID,
             customer_notify: 1,
             total_count: 60,
-            start_at: Math.floor(Date.now() / 1000) + (1 * 60)
+            start_at: Math.floor(Date.now() / 1000) + (15 * 60)
         };
 
         const newSubscription = await instance.subscriptions.create(options);
