@@ -183,7 +183,7 @@ const salesSchema = new mongoose.Schema({
   gst: {
     type: String,
   },
-  kot: {
+  kotId: {
     type: mongoose.Schema.ObjectId,
     ref: 'kotModel'
   }
