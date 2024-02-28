@@ -6,12 +6,13 @@ const Admin = require("../models/adminModel");
 const Consumer = require("../models/consumerModel");
 const subscribedUsersModel = require("../models/subscribedUsersModel");
 const Agent = require("../models/agentModel");
+
+
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   // console.log(req.cookies);
   
   // const { token } = req.cookies;
   const { token } = req.cookies;
-
 
   // console.log(token);
   if (!token) {

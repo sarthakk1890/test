@@ -17,7 +17,7 @@ exports.createSubscription = catchAsyncErrors(async (req, res, next) => {
 
         const newSubscription = await instance.subscriptions.create(options);
 
-        console.log(newSubscription)
+        // console.log(newSubscription)
 
         res.status(201).json({
             success: true,
@@ -43,11 +43,8 @@ exports.paymentVerification = catchAsyncErrors(async (req, res, next) => {
 
     try {
         const { razorpay_payment_id, razorpay_signature, razorpay_subscription_id, userData } = req.body;
-
         const user = await User.create(userData);
-
         const generated_signature = generateSignature(razorpay_payment_id, razorpay_subscription_id, process.env.RAZORPAY_SUBSCRIPTION_SECRET_KEY);
-
         const isAuthentic = generated_signature === razorpay_signature;
 
         if (!isAuthentic) {
@@ -61,9 +58,7 @@ exports.paymentVerification = catchAsyncErrors(async (req, res, next) => {
         }
 
         await Payment.create({ razorpay_payment_id, razorpay_signature, razorpay_subscription_id });
-
-        user.subscription_status = "Active";
-
+        // user.subscription_status = "Active";
         // Save the updated user object
         await user.save();
 
@@ -77,5 +72,4 @@ exports.paymentVerification = catchAsyncErrors(async (req, res, next) => {
             error,
         });
     }
-
 });

@@ -151,7 +151,7 @@ const userSchema = new mongoose.Schema(
     //------------Adding Subscription details-------------
     subscription_status: {
       type: String,
-      enum: ["Active", "Inactive"]
+      // enum: ["Active", "Inactive"]
     },
 
     subscription_id: {

@@ -215,6 +215,7 @@ const forceUpdate = require("./routes/forceUpdateRoute");
 const estimate = require("./routes/estimateRoute");
 const kot = require("./routes/kotRoute");
 const subscription = require('./routes/subscriptionRoute');
+const userModel = require("./models/userModel");
 
 
 const corsConfig = {
@@ -307,6 +308,25 @@ app.get('/api/v1/current-date', (req, res) => {
 })
 
 app.use(express.static(path.join(__dirname, "build")));
+
+
+//--Razorpay Webhook---------------
+app.post("/verification/razor", async (req, res, next) => {
+
+  const SECRET = "secretSarthak_123456789";
+
+  const subs_id = req.body.payload.subscription.entity.id;
+  const subs_status = req.body.payload.subscription.entity.status;
+
+  const User = await userModel.findOne({ subscription_id: subs_id });
+
+  user.subscription_status = subs_status;
+
+  await User.save();
+
+  res.json({ status: 'ok' });
+
+})
 
 app.get("*", (req, res) => {
   // res.send("connected");
