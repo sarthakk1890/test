@@ -22,6 +22,18 @@ const { isAuthenticatedUser, isSubscribed } = require("./middleware/auth");
 const errorMiddleware = require("./middleware/error");
 const logFile = fs.createWriteStream("./logfile.log", { flags: "w" }); //use {flags: 'w'} to open in write mode
 app.use(cookieParser());
+
+
+// Set up CORS configuration
+const corsOptions = {
+  origin: "*", // Allow requests from any origin
+  credentials: true,
+  methods: "GET,PUT,POST,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type, Authorization, Content-Length, X-Requested-With",
+};
+app.use(cors(corsOptions));
+
+
 //multerconnection
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
