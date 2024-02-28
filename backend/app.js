@@ -327,6 +327,8 @@ app.post("/verification/razor", async (req, res, next) => {
 
   const SECRET = "secretSarthak_123456789";
 
+  console.log("verification - razorpay")
+
   const subs_id = req.body.payload.subscription.entity.id;
   const subs_status = req.body.payload.subscription.entity.status;
 
