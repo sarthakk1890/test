@@ -332,6 +332,8 @@ app.post("/verification/razor", async (req, res, next) => {
   const subs_id = req.body.payload.subscription.entity.id;
   const subs_status = req.body.payload.subscription.entity.status;
 
+  console.log(subs_id);
+
   const User = await userModel.findOne({ subscription_id: subs_id });
 
   user.subscription_status = subs_status;
