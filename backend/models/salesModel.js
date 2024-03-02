@@ -32,7 +32,7 @@ const salesSchema = new mongoose.Schema({
         ref: "Product",
         // required: true,
       },
-      
+
       membership: {
         type: mongoose.Schema.ObjectId,
         ref: "MembershipPlans",
@@ -99,6 +99,9 @@ const salesSchema = new mongoose.Schema({
   gst: {
     type: String,
   },
+  kotId: {
+    type: String,
+  }
 });
 
 module.exports = mongoose.model("salesModel", salesSchema);
