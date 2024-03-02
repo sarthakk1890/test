@@ -4,6 +4,7 @@ const MemberShip = require("../models/membershipPlans");
 const ActiveMembership = require("../models/activeMemberships");
 const moment = require('moment-timezone');
 const Sales = require('../models/salesModel');
+const User = require('../models/userModel');
 
 //-----Helper functions-----
 function currentDate() {

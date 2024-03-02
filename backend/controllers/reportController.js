@@ -21,7 +21,6 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
 
   const user = req.user._id;
 
-
   if (!type) {
     res.status(404).json({
       success: false,
