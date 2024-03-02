@@ -10,7 +10,7 @@ const cors = require("cors");
 const multer = require("multer");
 var busboy = require("connect-busboy");
 const Inventory = require("./models/inventoryModel");
-const moment = require("moment-timezone");
+const schedule = require("node-schedule");
 
 // const passport = require('passport');
 // const passportLocal = require('./config/passport-local-strategy');
@@ -228,6 +228,10 @@ const estimate = require("./routes/estimateRoute");
 const kot = require("./routes/kotRoute");
 const subscription = require('./routes/subscriptionRoute');
 const userModel = require("./models/userModel");
+//---Import Gym and School routes
+const gymSchool = require('./routes/membershipRoute');
+const attendance = require('./routes/attendanceRoute');
+const activeMemberships = require("./models/activeMemberships");
 
 
 const corsConfig = {
@@ -307,6 +311,9 @@ app.use("/api/v1", invoice);
 app.use("/api/v1", estimate);
 app.use("/api/v1", kot);
 app.use("/api/v1/subscription", subscription);
+//----Gym and School---
+app.use("/api/v1/membership", gymSchool);
+app.use("/api/v1/attendance", attendance);
 
 //Getting current date route
 app.get('/api/v1/current-date', (req, res) => {
@@ -355,6 +362,49 @@ app.get("*", (req, res) => {
 app.use(errorMiddleware);
 // const forceUpdate = require("./routes/forceUpdateRoute");
 
+//-----------------Run Job schedule--------------------
+const moment = require('moment-timezone');
 
+function currentDate() {
+  const indiaTime = moment.tz('Asia/Kolkata');
+  const currentDateTimeInIndia = indiaTime.add(0, 'days').format('YYYY-MM-DD HH:mm:ss');
+  return currentDateTimeInIndia;
+}
+
+schedule.scheduleJob('0 0 * * 0', async () => {
+
+  const allActiveMemberships = await activeMemberships.find()
+    .populate('user', 'name email')
+    .populate('party', 'name address phoneNumber type guardianName createdAt')
+    .populate('membership', 'plan validity sellingPrice GSTincluded GSTRate CGST SGST IGST membershipType');
+
+  const currentDateTimeInIndia = currentDate();
+
+  for (const membership of allActiveMemberships) {
+    if (membership.activeStatus && moment(currentDateTimeInIndia) - moment(membership.checkedAt) > 7) {
+
+      console.log(membership.validity)
+      console.log(moment(currentDateTimeInIndia).diff(moment(membership.createdAt), 'days'))
+      if (moment(currentDateTimeInIndia).diff(moment(membership.createdAt), 'days') > membership.validity) {
+        membership.activeStatus = false;
+      }
+
+      const validityDays = membership.membership.validity;
+      const lastUpdated = moment(membership.updatedAt);
+      const todayDate = moment(currentDateTimeInIndia);
+
+      if (todayDate.diff(lastUpdated, 'days') > validityDays) {
+        membership.due = membership.due + membership.membership.sellingPrice;
+        membership.updatedAt = moment(currentDateTimeInIndia);
+      }
+
+      membership.checkedAt = moment(currentDateTimeInIndia);
+      await membership.save();
+
+    }
+  }
+})
+
+//-----------------------------------------------------
 
 module.exports = app;

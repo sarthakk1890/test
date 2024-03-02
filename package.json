@@ -29,6 +29,7 @@
     "moment-timezone": "^0.5.43",
     "mongoose": "^6.2.8",
     "multer": "^1.4.4",
+    "node-schedule": "^2.1.1",
     "nodemailer": "^6.7.3",
     "otp-generator": "^4.0.0",
     "passport": "^0.6.0",
