@@ -128,8 +128,8 @@ exports.getSingleSalesOrder = catchAsyncErrors(async (req, res, next) => {
   const salesOrder = await SalesOrder.findOne({ invoiceNum, 'user': userId })
     .populate("user", "name email")
     .populate({
-      path: 'orderItems.product',
-      model: 'inventory',
+      path: 'orderItems.membership',
+      model: 'MembershipPlans',
     })
     .exec();
 
