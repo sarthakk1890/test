@@ -39,7 +39,6 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
       { path: "user", select: "taxFile" },
     ]);
 
-
     sales.map((value, idx) => {
       if (!value.modeOfPayment[0].mode) {
         const mode = concatenateValues(value.modeOfPayment[0]);

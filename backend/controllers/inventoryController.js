@@ -94,7 +94,7 @@ exports.addInventoryImage = catchAsyncErrors(async (req, res, next) => {
     });
   }
 
-  if (req.files?.image) {
+  if (req.files && req.files.image) {
     const result = await uploadImage(req.files.image);
     req.body.image = result.url;
   }

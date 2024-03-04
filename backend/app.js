@@ -11,6 +11,7 @@ const multer = require("multer");
 var busboy = require("connect-busboy");
 const Inventory = require("./models/inventoryModel");
 const schedule = require("node-schedule");
+const moment = require('moment-timezone');
 
 // const passport = require('passport');
 // const passportLocal = require('./config/passport-local-strategy');
@@ -363,7 +364,6 @@ app.use(errorMiddleware);
 // const forceUpdate = require("./routes/forceUpdateRoute");
 
 //-----------------Run Job schedule--------------------
-const moment = require('moment-timezone');
 
 function currentDate() {
   const indiaTime = moment.tz('Asia/Kolkata');
