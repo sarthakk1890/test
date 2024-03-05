@@ -297,6 +297,10 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Invalid email or password", 400));
   }
 
+  if (!user.subscription_status || user.subscription_status !== 'active') {
+    return next(new ErrorHandler("Your subscription is not active", 403));
+  }
+
   sendToken(user, 200, res);
 });
 

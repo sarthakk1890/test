@@ -9,8 +9,7 @@ const Agent = require("../models/agentModel");
 
 
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
-  // console.log(req.cookies);
-  
+
   // const { token } = req.cookies;
   const { token } = req.cookies;
 
@@ -20,7 +19,17 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   }
   try {
     const decodedData = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decodedData.id);
+    const user = await User.findById(decodedData.id);
+    req.user = user;
+
+    if (!user) {
+      return next(new ErrorHandler("User not found", 404));
+    }
+
+    if (!user.subscription_status || user.subscription_status !== 'active') {
+      return next(new ErrorHandler("Your subscription is not active", 403));
+    }
+
     next();
   } catch (err) {
     return next(
@@ -97,15 +106,15 @@ exports.isSubscribed = catchAsyncErrors(async (req, res, next) => {
     req.user = await User.findById(decodedData.id);
     // console.log(req.user.phoneNumber);
     const user = User.findById(decodedData.id);
-    if(user === null){
+    if (user === null) {
       return next(new ErrorHandler("Please login to access this resource", 401));
     }
-    
+
     const subbedUser = await subscribedUsersModel.find({
-      phoneNumber: req.user.phoneNumber ,
+      phoneNumber: req.user.phoneNumber,
     })
     // console.log(subbedUser);
-    if(subbedUser.length === 0){
+    if (subbedUser.length === 0) {
       return next(new ErrorHandler("Please subscribe to access this resource", 401));
     }
     next();
