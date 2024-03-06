@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const activeMembershipsSchema = new mongoose.Schema({
-    
+
     user: {
         type: mongoose.Schema.ObjectId,
         ref: "User",
@@ -37,6 +37,13 @@ const activeMembershipsSchema = new mongoose.Schema({
     activeStatus: {
         type: Boolean,
         // required: true
+    },
+
+    //------Subscription Type------------
+    subscription_type: {
+        type: String,
+        enum: ['prepaid', 'postpaid'],
+        required: true
     },
 
     createdAt: {

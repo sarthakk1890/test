@@ -34,7 +34,7 @@ exports.newMembership = catchAsyncErrors(async (req, res, next) => {
 
 //Sell membership
 exports.sellMembership = catchAsyncErrors(async (req, res, next) => {
-    const { party, membership, validity = 365 } = req.body;
+    const { party, membership, validity = 365, subscription_type } = req.body;
 
     if (!(party && membership)) {
         return next(new ErrorHandler("Party and Membership are mandatory", 400));
@@ -51,9 +51,16 @@ exports.sellMembership = catchAsyncErrors(async (req, res, next) => {
     req.body.checkedAt = currentDate();
     req.body.lastPaid = currentDate();
     req.body.user = req.user._id;
-    req.body.due = 0;
     req.body.activeStatus = true;
     req.body.validity = validity;
+
+    if (subscription_type === 'postpaid') {
+        req.body.due = 0;
+    } else if (subscription_type === 'prepaid') {
+        const existingMembership = await MemberShip.findById(membership);
+        req.body.due = existingMembership.sellingPrice - req.body.total;
+        await Sales.create(req.body);
+    }
 
     const newPlan = await ActiveMembership.create(req.body);
 
