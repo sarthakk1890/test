@@ -15,12 +15,13 @@ function concatenateValues(obj) {
 
 // create new party
 exports.registerParty = catchAsyncErrors(async (req, res, next) => {
-  const { name, address, type, phoneNumber } = req.body;
+  const { name, address, type, phoneNumber, guardianName } = req.body;
   const party = await Party.create({
     name,
     address,
     phoneNumber,
     type,
+    guardianName,
     user: req.user._id,
   });
 
