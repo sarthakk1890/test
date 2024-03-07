@@ -2,7 +2,7 @@ const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const User = require("../models/userModel");
 const Order = require("../models/orderedItem");
-const Inventory = require("../models/inventoryModel");4
+const Inventory = require("../models/inventoryModel"); 4
 const Hotel = require("../models/hotelModel")
 const Consumer = require("../models/consumerModel");
 const jwt = require("jsonwebtoken");
@@ -165,7 +165,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     }
   }
 
-  if (req.files?.image) {
+  if (req.files && req.files.image) {
     const result = await uploadImage(req.files.image);
     req.body.image = result.url;
     // console.log(req.body.image);
@@ -1005,7 +1005,7 @@ exports.getPinStatus = catchAsyncErrors(async (req, res) => {
 // code for hotel usre seprate it in future
 
 exports.addGuest = catchAsyncErrors(async (req, res) => {
-  const { 
+  const {
     invoiceNum,
     guestName,
     numberOfGuest,
@@ -1033,29 +1033,29 @@ exports.addGuest = catchAsyncErrors(async (req, res) => {
   const userId = req.user._id;
   const owner = await User.findById(userId);
 
-  const newHotel = new Hotel ({
+  const newHotel = new Hotel({
     ...req.body,
     owner,
- })
+  })
 
   await newHotel.save()
-  return res.send({id:newHotel.id})
+  return res.send({ id: newHotel.id })
 
 })
 
 exports.hotelbill = catchAsyncErrors(async (req, res) => {
-  const id=req.params.id
+  const id = req.params.id
   const room = await Hotel.findById(id)
   console.log(room);
   res.send(room.RoomId)
 })
 
 exports.reports = catchAsyncErrors(async (req, res) => {
-  const id=req.params.id 
-  const room = await Hotel.find({owner:id})
+  const id = req.params.id
+  const room = await Hotel.find({ owner: id })
   console.log(room);
   res.send(room.RoomId)
-  
+
 
 })
 
@@ -1083,7 +1083,7 @@ exports.reports = catchAsyncErrors(async (req, res) => {
 exports.kotPush = catchAsyncErrors(async (req, res) => {
   const user = req.user._id;
 
-  const {item, date, qty}=req.body
+  const { item, date, qty } = req.body
   const kotData = new KOT({
     ...req.body,
     user
@@ -1091,28 +1091,28 @@ exports.kotPush = catchAsyncErrors(async (req, res) => {
 
   await kotData.save()
 
-  return res.send({kotData,success:true})
+  return res.send({ kotData, success: true })
 
 })
 
-exports.kotaGet=catchAsyncErrors(async(req,res)=>{
+exports.kotaGet = catchAsyncErrors(async (req, res) => {
   const userId = req.user._id;
- 
-  const kot= await KOT.find({user:userId})
- 
-  if(!kot){
-    return res.send({succes: false})
+
+  const kot = await KOT.find({ user: userId })
+
+  if (!kot) {
+    return res.send({ succes: false })
   }
 
   return res.send(kot)
 })
 
-exports.kotaGetAll=catchAsyncErrors(async(req,res)=>{
+exports.kotaGetAll = catchAsyncErrors(async (req, res) => {
 
-  const {kotId}=req.params
-  const kot= await KOT.findById(kotId)
-  if(!kot){
-    return res.send({succes: false})
+  const { kotId } = req.params
+  const kot = await KOT.findById(kotId)
+  if (!kot) {
+    return res.send({ succes: false })
   }
 
   return res.send(kot)

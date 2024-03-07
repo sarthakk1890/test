@@ -3,7 +3,6 @@ const instance = require("../utils/razorpay");
 const Payment = require("../models/paymentModel");
 const User = require("../models/userModel");
 const CryptoJS = require('crypto-js');
-const ErrorHandler = require("../utils/errorhandler");
 
 // Create a subscription
 exports.createSubscription = catchAsyncErrors(async (req, res, next) => {
