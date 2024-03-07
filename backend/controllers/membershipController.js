@@ -62,6 +62,8 @@ exports.sellMembership = catchAsyncErrors(async (req, res, next) => {
     } else if (subscription_type === 'prepaid') {
         req.body.due = existingMembership.sellingPrice - req.body.total;
         await Sales.create(req.body);
+        // Increment numSales in User model
+        await User.findByIdAndUpdate(req.user._id, { $inc: { numSales: 1 } });
     }
 
     const newPlan = await ActiveMembership.create(req.body);
