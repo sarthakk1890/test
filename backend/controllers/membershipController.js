@@ -34,7 +34,7 @@ exports.newMembership = catchAsyncErrors(async (req, res, next) => {
 
 //Sell membership
 exports.sellMembership = catchAsyncErrors(async (req, res, next) => {
-    const { party, membership, validity = 365, subscription_type } = req.body;
+    const { party, membership, validity = 365 } = req.body;
 
     if (!(party && membership)) {
         return next(new ErrorHandler("Party and Membership are mandatory", 400));
@@ -45,6 +45,9 @@ exports.sellMembership = catchAsyncErrors(async (req, res, next) => {
     if (existingPlan) {
         return next(new ErrorHandler("A plan with the provided party and membership already exists", 400));
     }
+
+    const existingMembership = await MemberShip.findById(membership);
+    const subscription_type = existingMembership.subscription_type;
 
     req.body.createdAt = currentDate();
     req.body.updatedAt = currentDate();
@@ -57,7 +60,6 @@ exports.sellMembership = catchAsyncErrors(async (req, res, next) => {
     if (subscription_type === 'postpaid') {
         req.body.due = 0;
     } else if (subscription_type === 'prepaid') {
-        const existingMembership = await MemberShip.findById(membership);
         req.body.due = existingMembership.sellingPrice - req.body.total;
         await Sales.create(req.body);
     }

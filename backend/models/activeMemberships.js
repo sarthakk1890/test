@@ -39,13 +39,6 @@ const activeMembershipsSchema = new mongoose.Schema({
         // required: true
     },
 
-    //------Subscription Type------------
-    subscription_type: {
-        type: String,
-        enum: ['prepaid', 'postpaid'],
-        required: true
-    },
-
     createdAt: {
         type: String,
     },

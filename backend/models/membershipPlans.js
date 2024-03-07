@@ -44,6 +44,13 @@ const membershipPlansSchema = new mongoose.Schema({
         type: Number,
     },
 
+    //------Subscription Type------------
+    subscription_type: {
+        type: String,
+        enum: ['prepaid', 'postpaid'],
+        required: true
+    },
+
 });
 
 module.exports = mongoose.model("MembershipPlans", membershipPlansSchema);
