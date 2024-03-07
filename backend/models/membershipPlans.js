@@ -48,7 +48,7 @@ const membershipPlansSchema = new mongoose.Schema({
     subscription_type: {
         type: String,
         enum: ['prepaid', 'postpaid'],
-        required: true
+        default: 'postpaid'
     },
 
 });
