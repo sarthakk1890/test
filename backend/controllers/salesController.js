@@ -424,3 +424,28 @@ exports.resetSalesCount = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Error resetting sales count", 500));
   }
 });
+
+//----Delete Sales using Invoice number-----------
+exports.deleteUsingInvoiceNum = catchAsyncErrors(async (req, res, next) => {
+  const invoiceNumToDelete = req.params.invoiceNum;
+  const userId = req.user;
+
+  try {
+    await SalesOrder.deleteOne({ invoiceNum: invoiceNumToDelete, user: userId });
+
+    const salesToUpdate = await SalesOrder.find({ invoiceNum: { $gt: invoiceNumToDelete }, user: userId });
+
+    for (const sale of salesToUpdate) {
+      const currentInvoiceNum = parseInt(sale.invoiceNum, 10);
+      if (parseInt(invoiceNumToDelete, 10) < currentInvoiceNum) {
+        sale.invoiceNum = (currentInvoiceNum - 1).toString();
+        await sale.save();
+      }
+    }
+
+    res.status(200).json({ message: `Sale with invoice number ${invoiceNumToDelete} deleted successfully.` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
