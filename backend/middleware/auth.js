@@ -10,8 +10,16 @@ const Agent = require("../models/agentModel");
 
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
 
-  // const { token } = req.cookies;
-  const { token } = req.cookies;
+  let token;
+
+  // Check if token exists in cookies
+  if (req.cookies.token) {
+    token = req.cookies.token;
+  }
+
+  if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
 
   // console.log(token);
   if (!token) {
