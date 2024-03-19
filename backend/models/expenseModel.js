@@ -6,9 +6,11 @@ const expenseSchema = mongoose.Schema({
     required: [true, "Please Enter income header"],
     trim: true,
   },
+
   description: {
     type: String,
   },
+
   amount: {
     type: Number,
     required: [true, "Please Enter expense amount"],
@@ -17,7 +19,7 @@ const expenseSchema = mongoose.Schema({
 
   modeOfPayment: {
     type: String,
-    required: [true, "Please choose your mode of payment"],
+    // required: [true, "Please choose your mode of payment"],
     $in: ["cash", "bank_transfer"],
   },
 
@@ -27,13 +29,13 @@ const expenseSchema = mongoose.Schema({
     required: true,
   },
 
-  date:{
+  date: {
     type: String
   },
-  
+
   createdAt: {
     type: Date,
-     default: Date.now,
+    default: Date.now,
   },
 });
 

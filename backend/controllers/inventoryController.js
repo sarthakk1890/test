@@ -56,6 +56,10 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     req.body.quantity = 99999;
   }
 
+  if (req.body.product) {
+    req.body.name = req.body.product;
+  }
+
   req.body.user = userDetail;
 
   if (barCode !== undefined && barCode !== "" && barCode !== null) {

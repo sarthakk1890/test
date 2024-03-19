@@ -62,11 +62,14 @@ const salesSchema = new mongoose.Schema({
     },
   ],
 
-  modeOfPayment: [paymentModeSchema],
+  modeOfPayment: {
+    type: [paymentModeSchema],
+    required: false
+  },
 
   total: {
     type: Number,
-    required: true,
+    // required: true,
   },
   party: {
     type: mongoose.Schema.ObjectId,
