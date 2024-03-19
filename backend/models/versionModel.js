@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const versionSchema = new mongoose.Schema({
     version: {
-        type: Number
+        type: String
     }
 });
 
