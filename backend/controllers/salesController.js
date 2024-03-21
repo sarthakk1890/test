@@ -428,7 +428,7 @@ exports.resetSalesCount = catchAsyncErrors(async (req, res, next) => {
 //----Delete Sales using Invoice number-----------
 exports.deleteUsingInvoiceNum = catchAsyncErrors(async (req, res, next) => {
   const invoiceNumToDelete = req.params.invoiceNum;
-  const userId = req.user;
+  const userId = req.user._id;
 
   try {
     await SalesOrder.deleteOne({ invoiceNum: invoiceNumToDelete, user: userId });
@@ -442,6 +442,9 @@ exports.deleteUsingInvoiceNum = catchAsyncErrors(async (req, res, next) => {
         await sale.save();
       }
     }
+
+    // Decrease numSales in User model
+    await User.findByIdAndUpdate(userId, { $inc: { numSales: -1 } });
 
     res.status(200).json({ message: `Sale with invoice number ${invoiceNumToDelete} deleted successfully.` });
   } catch (err) {
