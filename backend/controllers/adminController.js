@@ -9,6 +9,12 @@ const ExpenseModel = require("../models/expenseModel");
 const SalesModel = require("../models/salesModel");
 const InventoryModel = require("../models/inventoryModel");
 const PartyModel = require("../models/partyModel");
+const expenseModel = require("../models/expenseModel");
+const inventoryModel = require("../models/inventoryModel");
+const partyModel = require("../models/partyModel");
+const purchaseModel = require("../models/purchaseModel");
+const salesModel = require("../models/salesModel");
+const billingOrderModel = require("../models/billingOrderModel");
 
 // creating admin
 exports.createAdmin = catchAsyncErrors(async (req, res, next) => {
@@ -193,3 +199,35 @@ exports.getReportofUserAdmin = catchAsyncErrors(async (req, res, next) => {
 });
 
 
+//--------------------New User Delete Controller--------------------
+exports.removeUserCompletely = catchAsyncErrors(async (req, res, next) => {
+  const user = req.params.id;
+
+  await activeMemberships.deleteMany({ user });
+  await estimateModel.deleteMany({ user });
+  await expenseModel.deleteMany({ user });
+  await billingOrderModel.deleteMany({ user });
+  await kotModel.deleteMany({ user });
+  await partyModel.deleteMany({ user });
+  await salesModel.deleteMany({ user });
+  await inventoryModel.deleteMany({ user });
+  // await hotelModel.deleteMany({ owner: user });
+  // await Guest.deleteMany({ hotelId: user });
+  // await Invoice.deleteMany({ hotelId: user });
+  // await Rooms.deleteMany({ owner: user });
+  // await RoomsType.deleteMany({ owner: user });
+  // await incomeModel.deleteMany({ user });
+  await membershipPlans.deleteMany({ user });
+  // await orderedItem.deleteMany({ seller: user });
+  await purchaseModel.deleteMany({ user });
+  // await Rating.deleteMany({ sellerId: user });
+  await SalesReturnModel.deleteMany({ user });
+
+  await userModel.findByIdAndDelete(user);
+
+  res.status(200).json({
+    success: true,
+    message: "User and its data deleted successfully",
+  });
+
+})

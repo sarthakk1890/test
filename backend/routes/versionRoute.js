@@ -1,8 +1,10 @@
 const express = require('express');
-const { editVersion, getVersion } = require('../controllers/versionController');
+const { getVersion, createVersion, updateVersionByAppName } = require('../controllers/versionController');
+const { watch } = require('../models/partyModel');
 const router = express.Router();
 
-router.get("/latest", getVersion);
-router.put("/update", editVersion);
+router.get("/latest/:app", getVersion);
+router.put("/update/:app", updateVersionByAppName);
+router.post("/new", createVersion)
 
-module.exports = router; 
+module.exports = router;
