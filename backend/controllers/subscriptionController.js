@@ -8,7 +8,7 @@ const CryptoJS = require('crypto-js');
 exports.createSubscription = catchAsyncErrors(async (req, res, next) => {
     try {
         const options = {
-            plan_id: process.env.RAZORPAY_SUBSCRIPTION_PLAN_ID,
+            plan_id: "plan_NfPU48dijLvW9G",
             customer_notify: 1,
             total_count: 60,
             start_at: Math.floor(Date.now() / 1000) + (15 * 60)
@@ -43,7 +43,7 @@ exports.paymentVerification = catchAsyncErrors(async (req, res, next) => {
     try {
         const { razorpay_payment_id, razorpay_signature, razorpay_subscription_id, userData } = req.body;
         const user = await User.create(userData);
-        const generated_signature = generateSignature(razorpay_payment_id, razorpay_subscription_id, process.env.RAZORPAY_SUBSCRIPTION_SECRET_KEY);
+        const generated_signature = generateSignature(razorpay_payment_id, razorpay_subscription_id, "KYlU5W0hGJSDrP6OyI12Vc41");
         const isAuthentic = generated_signature === razorpay_signature;
 
         if (!isAuthentic) {
