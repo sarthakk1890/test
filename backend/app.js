@@ -127,9 +127,9 @@ app.post(
 );
 
 // Config
-if (process.env.NODE_ENV !== "PRODUCTION") {//
+//if (process.env.NODE_ENV !== "PRODUCTION") {
   require("dotenv").config({ path: "backend/config/config.env" });
-}//
+//}
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
