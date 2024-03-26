@@ -128,6 +128,10 @@ const billingOrderSchema = mongoose.Schema({
     },
     createdAt: {
         type: String
+    },
+    orderReady: {
+        type: Boolean,
+        default: false
     }
 });
 

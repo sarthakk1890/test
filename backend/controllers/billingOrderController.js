@@ -88,3 +88,29 @@ exports.deleteBillingOrder = catchAsyncErrors(async (req, res, next) => {
     });
 
 })
+
+//Change order ready status
+exports.updateOrderStatus = catchAsyncErrors(async (req, res, next) => {
+    const { kotId } = req.params;
+    const { orderReady } = req.body;
+    const user = req.user._id;
+
+    const updatedBillingOrder = await BillingOrder.findOneAndUpdate(
+        { kotId, user },
+        { $set: { orderReady: orderReady } },
+        { new: true }
+    );
+
+    if (!updatedBillingOrder) {
+        return res.status(404).json({
+            success: false,
+            message: 'Billing order not found'
+        });
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "Billing Order Updated successfully",
+        updatedBillingOrder
+    });
+});
