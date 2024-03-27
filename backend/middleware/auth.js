@@ -6,15 +6,21 @@ const Admin = require("../models/adminModel");
 const Consumer = require("../models/consumerModel");
 const subscribedUsersModel = require("../models/subscribedUsersModel");
 const Agent = require("../models/agentModel");
+const subUserModel = require("../models/subUserModel");
 
 
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
 
   let token;
+  let token_subuser;
 
   // Check if token exists in cookies
   if (req.cookies.token) {
     token = req.cookies.token;
+  }
+
+  if (req.cookies.token_subuser) {
+    token_subuser = req.cookies.token_subuser;
   }
 
   if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -25,20 +31,42 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   if (!token) {
     return next(new ErrorHandler("Please login to access this resource", 401));
   }
+
   try {
-    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decodedData.id);
-    req.user = user;
+    if (token && token_subuser) {
+      const decodedData = jwt.verify(token_subuser, process.env.JWT_SECRET);
+      const subUser = await subUserModel.findById(decodedData.id).populate('user');
+      if (!subUser) {
+        return next(new ErrorHandler("SubUser not found", 404));
+      }
 
-    if (!user) {
-      return next(new ErrorHandler("User not found", 404));
+      const user = subUser.user;
+
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+      if (!user.subscription_status || user.subscription_status !== 'active') {
+        return next(new ErrorHandler("Your subscription is not active", 403));
+      }
+
+      req.user = user;
+
+      next();
     }
 
-    if (!user.subscription_status || user.subscription_status !== 'active') {
-      return next(new ErrorHandler("Your subscription is not active", 403));
+    else if (token) {
+      const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decodedData.id);
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+      if (!user.subscription_status || user.subscription_status !== 'active') {
+        return next(new ErrorHandler("Your subscription is not active", 403));
+      }
+      req.user = user;
+      next();
     }
 
-    next();
   } catch (err) {
     return next(
       new ErrorHandler(
