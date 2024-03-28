@@ -94,3 +94,19 @@ exports.deleteSubUser = catchAsyncErrors(async (req, res, next) => {
         message: "Subuser deleted successfully",
     });
 });
+
+//Get list of subUsers
+exports.getAllSubUsers = catchAsyncErrors(async (req, res, next) => {
+
+    if (req.cookies.token_subuser) {
+        return next(new ErrorHandler("Access Denied", 403));
+    }
+
+    const user = req.user._id;
+
+    const subUsers = await subUserModel.find({ user });
+    res.status(200).json({
+        success: true,
+        subUsers,
+    });
+});
