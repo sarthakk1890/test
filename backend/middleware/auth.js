@@ -49,6 +49,7 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("Your subscription is not active", 403));
       }
 
+      req.subUser = subUser;
       req.user = user;
 
       next();

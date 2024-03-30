@@ -18,6 +18,12 @@ exports.createBillingOrder = catchAsyncErrors(async (req, res, next) => {
     req.body.user = req.user._id;
     req.body.createdAt = currentDate();
 
+    req.body.userName = req.user.businessName;
+
+    if (req.subUser) {
+        req.body.subUserName = req.subUser.name;
+    }
+
     const billingOrder = await BillingOrder.create(req.body);
 
     res.status(201).json({

@@ -41,6 +41,7 @@ const {
   getAllInventorieswithSearch,
 } = require("../controllers/inventoryController");
 const { isAuthenticatedConsumer } = require("../middleware/auth");
+const { getAllProductsFromSeller } = require('../controllers/consumerController');
 
 const router = express.Router();
 
@@ -73,10 +74,6 @@ router
   .get(isAuthenticatedConsumer, getSellersAndSearch);
 
 router.route("/sellers").get(isAuthenticatedConsumer, getSellers);
-
-router
-  .route("/sellerProduct/:id")
-  .get(isAuthenticatedConsumer, getProductsOfUser);
 
 router.route("/sellers/search").get(isAuthenticatedConsumer, getSellersByName);
 
@@ -139,7 +136,12 @@ router.route("/delete").get(deleteAccountPage);
 router.route("/rate/:productId").post(isAuthenticatedConsumer, rating);
 
 router.route("/policy").get(policyPage);
-module.exports = router;
-const { getAllProductsFromSeller } = require('../controllers/consumerController');
 
 router.route('/seller/:sellerName/products').get(getAllProductsFromSeller);
+
+
+//QR routes
+router.route("/sellerProduct/:id").get(getProductsOfUser);
+
+
+module.exports = router;

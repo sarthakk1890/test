@@ -104,7 +104,15 @@ const salesSchema = new mongoose.Schema({
   },
   kotId: {
     type: String,
+  },
+
+  userName: {
+    type: String,
+  },
+  subUserName: {
+    type: String,
   }
+
 });
 
 module.exports = mongoose.model("salesModel", salesSchema);

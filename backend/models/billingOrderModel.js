@@ -132,6 +132,12 @@ const billingOrderSchema = mongoose.Schema({
     orderReady: {
         type: Boolean,
         default: false
+    },
+    userName: {
+        type: String,
+    },
+    subUserName: {
+        type: String,
     }
 });
 

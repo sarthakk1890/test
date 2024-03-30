@@ -20,25 +20,25 @@ const estimateSchema = new mongoose.Schema({
         ref: "Product",
         required: true,
       },
-      saleSGST:{
-        type:Number
-      },
-      saleCGST:{ 
-        type:Number
-      },
-      baseSellingPrice:{
+      saleSGST: {
         type: Number
       },
-      saleIGST:{
+      saleCGST: {
         type: Number
       },
-      hsn:{
-        type:String
+      baseSellingPrice: {
+        type: Number
       },
-      discountAmt:{
-        type:Number
+      saleIGST: {
+        type: Number
       },
-      originalbaseSellingPrice:{
+      hsn: {
+        type: String
+      },
+      discountAmt: {
+        type: Number
+      },
+      originalbaseSellingPrice: {
         type: Number
       }
     },
@@ -52,24 +52,30 @@ const estimateSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  estimateNum:{
+  estimateNum: {
     type: Number,
     required: true
   },
   createdAt: {
     type: String,
   },
-  reciverName:{
+  reciverName: {
     type: String
   },
-  businessName:{
+  businessName: {
     type: String
   },
-  businessAddress:{
+  businessAddress: {
     type: String
   },
-  gst:{
+  gst: {
     type: String
+  },
+  userName: {
+    type: String,
+  },
+  subUserName: {
+    type: String,
   }
 
 });

@@ -150,7 +150,15 @@ exports.convertEstimateToSalesOrder = catchAsyncErrors(async (req, res, next) =>
         ? [{ mode: modeOfPayment, amount: total }]
         : modeOfPayment;
 
-    const salesOrder = await SalesOrder.create({
+
+    const userName = req.user.businessName;
+    let subUserName;
+
+    if (req.subUser) {
+        subUserName = req.subUser.name;
+    }
+
+    const salesOrderData = {
         orderItems,
         party,
         modeOfPayment: paymentArray,
@@ -161,8 +169,16 @@ exports.convertEstimateToSalesOrder = catchAsyncErrors(async (req, res, next) =>
         businessName,
         businessAddress,
         gst,
-        invoiceNum
-    });
+        invoiceNum,
+        userName
+    };
+
+    if (subUserName) {
+        salesOrderData.subUserName = subUserName;
+    }
+
+    const salesOrder = await SalesOrder.create(salesOrderData);
+
 
     // Increment numSales in User model
     await User.findByIdAndUpdate(req.user._id, { $inc: { numSales: 1 } });
