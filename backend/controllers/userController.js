@@ -281,27 +281,51 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findOne({ email }).select("+password");
   // console.log(user._id);
 
+
+  let subUser;
+
   if (!user) {
+    subUser = await subUserModel.findOne({ email }).populate('user').select("+password");
+  }
+
+  if (!user && !subUser) {
     console.log("wrong password");
     return next(new ErrorHandler("Invalid email or password", 400));
   }
 
-  const isPasswordMatched = await user.comparePassword(password);
+  if (user) {
+    const isPasswordMatched = await user.comparePassword(password);
 
-  if (isPasswordMatched) {
-    console.log("correct");
+    if (!isPasswordMatched) {
+      console.log("wrong password");
+      return next(new ErrorHandler("Invalid email or password", 400));
+    }
+
+    if (!user.subscription_status || user.subscription_status !== 'active') {
+      return next(new ErrorHandler("Your subscription is not active", 403));
+    }
+
+    sendToken(user, 200, res);
   }
 
-  if (!isPasswordMatched) {
-    console.log("wrong password");
-    return next(new ErrorHandler("Invalid email or password", 400));
+  else if (subUser) {
+    const isPasswordMatched = await subUser.comparePassword(password);
+    if (!isPasswordMatched) {
+      console.log("wrong password");
+      return next(new ErrorHandler("Invalid email or password", 400));
+    }
+    const user = subUser.user;
+    if (!user.subscription_status || user.subscription_status !== 'active') {
+      return next(new ErrorHandler("Your subscription is not active", 403));
+    }
+    sendToken(user, 200, res, subUser);
   }
 
-  if (!user.subscription_status || user.subscription_status !== 'active') {
-    return next(new ErrorHandler("Your subscription is not active", 403));
-  }
 
-  sendToken(user, 200, res);
+  // if (isPasswordMatched) {
+  //   console.log("correct");
+  // }
+
 });
 
 // logout user
@@ -487,6 +511,7 @@ exports.updateUpi = catchAsyncErrors(async (req, res, next) => {
 
 const multer = require("multer");
 const orderedItem = require("../models/orderedItem");
+const subUserModel = require("../models/subUserModel");
 
 exports.uploadData = catchAsyncErrors(async (req, res, next) => {
   if (!req.file) {
@@ -623,8 +648,6 @@ exports.changeStatus = catchAsyncErrors(async (req, res, next) => {
     return res.status(500).send("An error occurred");
   }
 });
-
-
 
 
 exports.orderStatus = catchAsyncErrors(async (req, res, next) => {
@@ -962,9 +985,6 @@ exports.deletePin = catchAsyncErrors(async (req, res) => {
   await user.save()
 
   return res.json({ success: true, msg: "PIN Deleted" });
-
-
-
 })
 
 exports.editPin = catchAsyncErrors(async (req, res) => {
