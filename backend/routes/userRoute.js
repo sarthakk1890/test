@@ -7,25 +7,15 @@ const {
   getUserDetails,
   updatePassword,
   updateProfile,
-  sendOtp,
   verifyOtp,
   signUpWithPhoneNumber,
-  resetPassword,
   getUpi,
   updateUpi,
   uploadData,
   renderRegister,
   paymentMode,
   changeStatus,
-  collect,
-  webLogin,
-  renderWebLogin,
-  renderBulkupload,
-  acceptAll,
   orderStatus,
-  acceptOrder,
-  rejectStatus,
-  rejectAll,
   openCloseShop,
   changeTiming,
   orderData,
@@ -42,7 +32,17 @@ const {
   kotaGet,
   kotPush,
   kotaGetAll,
-  getReport
+  // sendOtp,
+  // resetPassword,
+  // collect,
+  // webLogin,
+  // renderWebLogin,
+  // renderBulkupload,
+  // acceptAll,
+  // acceptOrder,
+  // rejectStatus,
+  // rejectAll,
+  // getReport,
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -67,23 +67,21 @@ router.route("/signup/verifyotp").post(verifyOtp);
 
 router.route("/signup/otp").post(signUpWithPhoneNumber);
 
-router.route("/password/reset").put(resetPassword);
-
 router.route("/getupi/:userId").get(getUpi);
 
 router.route("/upi/updateupi").put(isAuthenticatedUser, updateUpi);
 
 router.route("/registerpage").get(renderRegister);
 
+// router.route("/password/reset").put(resetPassword);
+
 // router.route("/collect").post(collect);
 
-router.route("/renderweblogin").get(renderWebLogin);
+// router.route("/renderweblogin").get(renderWebLogin);
 
-router.route("/weblogin").post(webLogin);
+// router.route("/weblogin").post(webLogin);
 
-router.route("/renderbnulk").get(renderBulkupload);
-
-router.route("/myorders").get(isAuthenticatedUser, orderStatus);
+// router.route("/renderbnulk").get(renderBulkupload);
 
 // router.route('/myorders').get(isAuthenticatedUser,orderStatus)
 
@@ -91,9 +89,11 @@ router.route("/myorders").get(isAuthenticatedUser, orderStatus);
 
 // router.route('/myorders/reject/:productId').get(rejectStatus)
 
-router.route("/myorders/acceptall/:orderId").get(acceptAll);
+// router.route("/myorders/acceptall/:orderId").get(acceptAll);
 
-router.route("/myorders/rejectall/:orderId").get(rejectAll);
+// router.route("/myorders/rejectall/:orderId").get(rejectAll);
+
+router.route("/myorders").get(isAuthenticatedUser, orderStatus);
 
 const multer = require("multer");
 
@@ -108,22 +108,22 @@ router.route("/order/details/:orderId").get(orderData);
 router.route("/rating/:productId").get(avgRating);
 router.route("/discount/add/:userId").post(addDiscount)
 
-router.route("/getpin").post(isAuthenticatedUser,genratePin)
-router.route('/deletepin').post(isAuthenticatedUser,deletePin)
+router.route("/getpin").post(isAuthenticatedUser, genratePin)
+router.route('/deletepin').post(isAuthenticatedUser, deletePin)
 
-router.route('/verifypin').post(isAuthenticatedUser,verifyPin)
+router.route('/verifypin').post(isAuthenticatedUser, verifyPin)
 
 router.route("/editpin").post(isAuthenticatedUser, editPin)
 
-router.route("/pinstatus").get(isAuthenticatedUser,getPinStatus)
+router.route("/pinstatus").get(isAuthenticatedUser, getPinStatus)
 
 
 
-router.route("/hoteldata").post(isAuthenticatedUser,addGuest)
+router.route("/hoteldata").post(isAuthenticatedUser, addGuest)
 
-router.route("/hotelbill/:id").get(isAuthenticatedUser,hotelbill)
+router.route("/hotelbill/:id").get(isAuthenticatedUser, hotelbill)
 
-router.route("/reports/:id").get(isAuthenticatedUser,reports)
+router.route("/reports/:id").get(isAuthenticatedUser, reports)
 
 // router.route('/get-report').post(isAuthenticatedUser,getReport)
 
@@ -157,13 +157,13 @@ module.exports = router;
 router.route("/payment-status/:orderId/:status").get(paymentMode)
 
 
-router.route("/test").get(async(req,res)=>{
- 
-const indiaTime = moment.tz('Asia/Kolkata');
+router.route("/test").get(async (req, res) => {
 
-// Get the current date and time in the India timezone
-const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
-res.send(currentDateTimeInIndia);
+  const indiaTime = moment.tz('Asia/Kolkata');
+
+  // Get the current date and time in the India timezone
+  const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
+  res.send(currentDateTimeInIndia);
 })
 
 

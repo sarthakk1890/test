@@ -24,18 +24,18 @@ const orderedItemSchema = mongoose.Schema({
         type: Number,
         required: true,
       },
-      status:{
+      status: {
         type: String,
         // enum: ['pending', 'confirmed','dispatched','delivered','rejected','cancelled','refunded'],
         default: 'pending'
       },
-      
-      sellerId:{
+
+      sellerId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
         required: true,
       },
-      sellerName:{
+      sellerName: {
         type: String,
       }
     },
@@ -45,38 +45,37 @@ const orderedItemSchema = mongoose.Schema({
     ref: "User",
     // required: true,
   },
-  isPaid:{
+  isPaid: {
     type: Boolean,
     default: false
   },
-  orederStatus:{
+  orederStatus: {
     type: String
   },
-  consumerId:{
+  consumerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Consumer",
     required: true,
   },
+  consumerName: {
+    type: String
+  },
+  sellerNum: {
+    type: String
+  },
+  sellerUpi: {
+    type: String
+  },
+  invoiceNum: {
+    type: String
+  },
 
-  consumerName:{
-    type: String
-  },
-  sellerNum:{
-    type: String
-  },
-  sellerUpi:{
-    type: String
-  },
-  invoiceNum:{
-    type: String
-  },
-  
 
-addresses: {
-    name:{
+  addresses: {
+    name: {
       type: String
     },
-     country: {
+    country: {
       type: String,
       default: "india"
       // required: true,
@@ -113,15 +112,14 @@ addresses: {
     longitude: {
       type: String,
     },
-  
 
 
-},
-date:{
-  type: Date,
-  default: Date.now,
-},
 
+  },
+  date: {
+    type: Date,
+    default: Date.now,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

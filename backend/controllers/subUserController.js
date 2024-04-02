@@ -6,7 +6,7 @@ const sendToken = require("../utils/jwtToken");
 exports.registerSubUser = catchAsyncErrors(async (req, res, next) => {
 
     if (req.cookies.token_subuser) {
-        return next(new ErrorHandler("Access Denied", 403));
+        return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
     }
 
     const user = req.user._id;
@@ -20,33 +20,33 @@ exports.registerSubUser = catchAsyncErrors(async (req, res, next) => {
 });
 
 
-exports.loginSubUser = catchAsyncErrors(async (req, res, next) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        return next(new ErrorHandler("Please enter email and password", 400));
-    }
-    const subUser = await subUserModel.findOne({ email }).populate('user').select("+password");
-    if (!subUser) {
-        console.log("wrong password");
-        return next(new ErrorHandler("Invalid email or password", 400));
-    }
-    const isPasswordMatched = await subUser.comparePassword(password);
-    if (!isPasswordMatched) {
-        console.log("wrong password");
-        return next(new ErrorHandler("Invalid email or password", 400));
-    }
-    const user = subUser.user;
-    if (!user.subscription_status || user.subscription_status !== 'active') {
-        return next(new ErrorHandler("Your subscription is not active", 403));
-    }
-    sendToken(user, 200, res, subUser);
-})
+// exports.loginSubUser = catchAsyncErrors(async (req, res, next) => {
+//     const { email, password } = req.body;
+//     if (!email || !password) {
+//         return next(new ErrorHandler("Please enter email and password", 400));
+//     }
+//     const subUser = await subUserModel.findOne({ email }).populate('user').select("+password");
+//     if (!subUser) {
+//         console.log("wrong password");
+//         return next(new ErrorHandler("Invalid email or password", 400));
+//     }
+//     const isPasswordMatched = await subUser.comparePassword(password);
+//     if (!isPasswordMatched) {
+//         console.log("wrong password");
+//         return next(new ErrorHandler("Invalid email or password", 400));
+//     }
+//     const user = subUser.user;
+//     if (!user.subscription_status || user.subscription_status !== 'active') {
+//         return next(new ErrorHandler("Your subscription is not active", 403));
+//     }
+//     sendToken(user, 200, res, subUser);
+// })
 
 // Edit Sub User
 exports.editSubUser = catchAsyncErrors(async (req, res, next) => {
 
     if (req.cookies.token_subuser) {
-        return next(new ErrorHandler("Access Denied", 403));
+        return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
     }
 
     const { subUserId } = req.params;
@@ -78,7 +78,7 @@ exports.editSubUser = catchAsyncErrors(async (req, res, next) => {
 exports.deleteSubUser = catchAsyncErrors(async (req, res, next) => {
 
     if (req.cookies.token_subuser) {
-        return next(new ErrorHandler("Access Denied", 403));
+        return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
     }
 
     const { subUserId } = req.params;
@@ -99,7 +99,7 @@ exports.deleteSubUser = catchAsyncErrors(async (req, res, next) => {
 exports.getAllSubUsers = catchAsyncErrors(async (req, res, next) => {
 
     if (req.cookies.token_subuser) {
-        return next(new ErrorHandler("Access Denied", 403));
+        return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
     }
 
     const user = req.user._id;

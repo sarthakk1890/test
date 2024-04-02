@@ -24,6 +24,11 @@ const KOT = require('../models/kotModel')
 const { uploadImage } = require("../services/upload");
 
 exports.avgRating = catchAsyncErrors(async (req, res, next) => {
+
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
+
   try {
     const productId = req.params.productId;
     const product = await Inventory.findById(productId);
@@ -47,7 +52,13 @@ exports.avgRating = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
+
 exports.verifyOtp = catchAsyncErrors(async (req, res, next) => {
+
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
+
   const otpHolder = await otpModel.find({
     phoneNumber: req.body.number,
   });
@@ -91,7 +102,13 @@ exports.verifyOtp = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
+
 exports.signUpWithPhoneNumber = catchAsyncErrors(async (req, res, next) => {
+
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
+
   const userOtp = await User.findOne({
     phoneNumber: req.body.number,
   });
@@ -207,68 +224,68 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 });
 
 // register user
-exports.registerUser123 = catchAsyncErrors(async (req, res, next) => {
-  if (!req.body.GstIN) {
-    console.log("jhhh");
-  }
+// exports.registerUser123 = catchAsyncErrors(async (req, res, next) => {
+//   if (!req.body.GstIN) {
+//     console.log("jhhh");
+//   }
 
-  if (req.files?.image) {
-    const result = await uploadImage(req.files.image);
-    req.body.image = result.url;
-    console.log(req.body.image);
-  }
+//   if (req.files?.image) {
+//     const result = await uploadImage(req.files.image);
+//     req.body.image = result.url;
+//     console.log(req.body.image);
+//   }
 
-  const { locality, city, state } = req.body; // Extracting address subfields
+//   const { locality, city, state } = req.body; // Extracting address subfields
 
-  const lowercaseLocality = locality.toLowerCase();
-  const lowercaseCity = city.toLowerCase();
-  const lowercaseState = state.toLowerCase();
+//   const lowercaseLocality = locality.toLowerCase();
+//   const lowercaseCity = city.toLowerCase();
+//   const lowercaseState = state.toLowerCase();
 
-  // console.log(city);
+//   // console.log(city);
 
-  const data = await User.findOne({ phoneNumber: req.body.phoneNumber });
-  if (data) {
-    return next(
-      new ErrorHandler("Phone Number already registered, Sign In instead", 400)
-    );
-  }
+//   const data = await User.findOne({ phoneNumber: req.body.phoneNumber });
+//   if (data) {
+//     return next(
+//       new ErrorHandler("Phone Number already registered, Sign In instead", 400)
+//     );
+//   }
 
-  const user = await User.create({
-    ...req.body,
-    address: {
-      locality: lowercaseLocality,
-      city: lowercaseCity,
-      state: lowercaseState,
-      country: "India", // Assuming the country is always India
-    },
-  });
+//   const user = await User.create({
+//     ...req.body,
+//     address: {
+//       locality: lowercaseLocality,
+//       city: lowercaseCity,
+//       state: lowercaseState,
+//       country: "India", // Assuming the country is always India
+//     },
+//   });
 
-  // sendToken(user, 201, res);
-  return res.render("signedupsuccess");
-});
+//   // sendToken(user, 201, res);
+//   return res.render("signedupsuccess");
+// });
 
-exports.registerUser0 = catchAsyncErrors(async (req, res, next) => {
-  console.log("inside ");
-  if (req.files?.image) {
-    const result = await upload(req.files.image);
-    req.body.image = result.url;
-  }
-  const data = await User.findOne({ phoneNumber: req.body.phoneNumber });
-  if (data) {
-    return next(
-      new ErrorHandler("Phone Number already registered , Sign In instead", 400)
-    );
-  }
+// exports.registerUser0 = catchAsyncErrors(async (req, res, next) => {
+//   console.log("inside ");
+//   if (req.files?.image) {
+//     const result = await upload(req.files.image);
+//     req.body.image = result.url;
+//   }
+//   const data = await User.findOne({ phoneNumber: req.body.phoneNumber });
+//   if (data) {
+//     return next(
+//       new ErrorHandler("Phone Number already registered , Sign In instead", 400)
+//     );
+//   }
 
-  const user = await User.create({ ...req.body });
-  const subbed = await subscribedUsersModel.create({
-    email: req.body.email,
-    phoneNumber: req.body.phoneNumber,
-    expireAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 15),
-  });
+//   const user = await User.create({ ...req.body });
+//   const subbed = await subscribedUsersModel.create({
+//     email: req.body.email,
+//     phoneNumber: req.body.phoneNumber,
+//     expireAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 15),
+//   });
 
-  sendToken(user, 201, res);
-});
+//   sendToken(user, 201, res);
+// });
 
 // Login user
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {
@@ -321,11 +338,6 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
     sendToken(user, 200, res, subUser);
   }
 
-
-  // if (isPasswordMatched) {
-  //   console.log("correct");
-  // }
-
 });
 
 // logout user
@@ -357,50 +369,48 @@ exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   const user = await User.findById(req.user.id).select("+password");
-
   const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
-
   if (!isPasswordMatched) {
     return next(new ErrorHandler("Old password is incorrect", 400));
   }
-
   if (req.body.newPassword !== req.body.confirmPassword) {
     return next(new ErrorHandler("password does not match", 400));
   }
-
   user.password = req.body.newPassword;
-
   await user.save();
-
   sendToken(user, 200, res);
 });
 
 exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   const newUserData = {
     name: req.body.name,
     email: req.body.email,
   };
-
   const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
   });
-
   res.status(200).json({
     success: true,
   });
 });
 
-exports.getAllUser = catchAsyncErrors(async (req, res, next) => {
-  const users = await User.find();
+// exports.getAllUser = catchAsyncErrors(async (req, res, next) => {
+//   const users = await User.find();
 
-  res.status(200).json({
-    success: true,
-    users,
-  });
-});
+//   res.status(200).json({
+//     success: true,
+//     users,
+//   });
+// });
 
 // update User Role -- Admin
 // exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
@@ -421,27 +431,29 @@ exports.getAllUser = catchAsyncErrors(async (req, res, next) => {
 //   });
 // });
 
-exports.sendOtp = catchAsyncErrors(async (req, res, next) => {
-  const response = await fast2sms.sendMessage({
-    authorization: process.env.FAST_TWO_SMS,
-    message: req.body.message,
-    numbers: [req.body.number],
-  });
+// exports.sendOtp = catchAsyncErrors(async (req, res, next) => {
+//   const response = await fast2sms.sendMessage({
+//     authorization: process.env.FAST_TWO_SMS,
+//     message: req.body.message,
+//     numbers: [req.body.number],
+//   });
 
-  res.status(200).json({
-    success: true,
-    response,
-  });
-});
+//   res.status(200).json({
+//     success: true,
+//     response,
+//   });
+// });
+
 
 exports.refreshJwtToken = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   let token;
-
   // Check if token exists in cookies
   if (req.cookies.token) {
     token = req.cookies.token;
   }
-
   if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
   }
@@ -453,22 +465,23 @@ exports.refreshJwtToken = catchAsyncErrors(async (req, res, next) => {
   sendToken(user, 200, res);
 });
 
-exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
-  const { newPassword, confirmPassword, phoneNumber } = req.body;
-  if (newPassword !== confirmPassword) {
-    return next(new ErrorHandler("password does not match", 400));
-  }
-  const user = await User.findOne({ phoneNumber });
-  if (!user) {
-    return next(new ErrorHandler("User not found", 400));
-  }
-  user.password = newPassword;
-  await user.save();
-  res.status(200).json({
-    success: true,
-    message: "Password updated successfully",
-  });
-});
+
+// exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
+//   const { newPassword, confirmPassword, phoneNumber } = req.body;
+//   if (newPassword !== confirmPassword) {
+//     return next(new ErrorHandler("password does not match", 400));
+//   }
+//   const user = await User.findOne({ phoneNumber });
+//   if (!user) {
+//     return next(new ErrorHandler("User not found", 400));
+//   }
+//   user.password = newPassword;
+//   await user.save();
+//   res.status(200).json({
+//     success: true,
+//     message: "Password updated successfully",
+//   });
+// });
 
 // GetUser UPi
 
@@ -482,9 +495,13 @@ exports.getUpi = catchAsyncErrors(async (req, res, next) => {
     upi,
   });
 });
+
 // Update user UPI
 
 exports.updateUpi = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   const { upi_id } = req.body;
 
   // Find the user by their ID
@@ -514,6 +531,9 @@ const orderedItem = require("../models/orderedItem");
 const subUserModel = require("../models/subUserModel");
 
 exports.uploadData = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   if (!req.file) {
     return res.status(400).json({ message: "No file uploaded" });
   }
@@ -574,52 +594,52 @@ exports.renderRegister = catchAsyncErrors(async (req, res, next) => {
   return res.render("register");
 });
 
-exports.renderWebLogin = catchAsyncErrors(async (req, res, next) => {
-  return res.render("weblogin");
-});
+// exports.renderWebLogin = catchAsyncErrors(async (req, res, next) => {
+//   return res.render("weblogin");
+// });
 
-exports.webLogin = catchAsyncErrors(async (req, res, nex) => {
-  console.log("oooo");
+// exports.webLogin = catchAsyncErrors(async (req, res, nex) => {
+//   console.log("oooo");
 
-  const { email, password } = req.body;
+//   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return next(new ErrorHandler("Please enter email and password", 400));
-  }
+//   if (!email || !password) {
+//     return next(new ErrorHandler("Please enter email and password", 400));
+//   }
 
-  const user = await User.findOne({ email }).select("+password");
+//   const user = await User.findOne({ email }).select("+password");
 
-  if (!user) {
-    console.log("wrong password");
-    return next(new ErrorHandler("Invalid email or password", 400));
-  }
+//   if (!user) {
+//     console.log("wrong password");
+//     return next(new ErrorHandler("Invalid email or password", 400));
+//   }
 
-  const isPasswordMatched = await user.comparePassword(password);
+//   const isPasswordMatched = await user.comparePassword(password);
 
-  if (isPasswordMatched) {
-    console.log("correct");
-  }
+//   if (isPasswordMatched) {
+//     console.log("correct");
+//   }
 
-  if (!isPasswordMatched) {
-    console.log("wrong password");
-    return next(new ErrorHandler("Invalid email or password", 400));
-  }
+//   if (!isPasswordMatched) {
+//     console.log("wrong password");
+//     return next(new ErrorHandler("Invalid email or password", 400));
+//   }
 
-  // console.log(user);
-  // sendTokenlogin(user, 200, res)
-  // return res.redirect('/api/v1/renderbnulk')
-  const responseData = {
-    success: true,
-    user: req.user,
-    token: req.cookies.token,
-  };
-  return res.render("bulkupload", { data: responseData });
-});
+//   // console.log(user);
+//   // sendTokenlogin(user, 200, res)
+//   // return res.redirect('/api/v1/renderbnulk')
+//   const responseData = {
+//     success: true,
+//     user: req.user,
+//     token: req.cookies.token,
+//   };
+//   return res.render("bulkupload", { data: responseData });
+// });
 
-exports.renderBulkupload = catchAsyncErrors(async (req, res, next) => {
-  console.log(req.user);
-  return res.render("bulkupload");
-});
+// exports.renderBulkupload = catchAsyncErrors(async (req, res, next) => {
+//   console.log(req.user);
+//   return res.render("bulkupload");
+// });
 
 exports.changeStatus = catchAsyncErrors(async (req, res, next) => {
   const { orderId, status } = req.params; // Assuming productId is provided in the request
@@ -628,8 +648,6 @@ exports.changeStatus = catchAsyncErrors(async (req, res, next) => {
   }
   try {
     const order = await mongoose.model("orderedItem").findById(orderId);
-
-
 
     if (!order) {
       return res.status(404).send("Order not found");
@@ -754,43 +772,46 @@ exports.acceptOrder = catchAsyncErrors(async (req, res, nex) => {
   }
 });
 
-exports.acceptAll = catchAsyncErrors(async (req, res, next) => {
-  const { orderId } = req.params;
+// exports.acceptAll = catchAsyncErrors(async (req, res, next) => {
+//   const { orderId } = req.params;
 
-  const order = await Order.findById(orderId);
+//   const order = await Order.findById(orderId);
 
-  order.items.forEach((item) => {
-    item.status = "confirmed";
-  });
+//   order.items.forEach((item) => {
+//     item.status = "confirmed";
+//   });
 
-  await order.save();
+//   await order.save();
 
-  res.status(200).json({
-    success: true,
-    message: "Status of all products changed to confirmed",
-  });
-});
+//   res.status(200).json({
+//     success: true,
+//     message: "Status of all products changed to confirmed",
+//   });
+// });
 
-exports.rejectAll = catchAsyncErrors(async (req, res, next) => {
-  const { orderId } = req.params;
+// exports.rejectAll = catchAsyncErrors(async (req, res, next) => {
+//   const { orderId } = req.params;
 
-  const order = await Order.findById(orderId);
+//   const order = await Order.findById(orderId);
 
-  order.items.forEach((item) => {
-    item.status = "rejected";
-  });
+//   order.items.forEach((item) => {
+//     item.status = "rejected";
+//   });
 
-  await order.save();
+//   await order.save();
 
-  res.status(200).json({
-    success: true,
-    message: "Status of all products changed to confirmed",
-  });
-});
+//   res.status(200).json({
+//     success: true,
+//     message: "Status of all products changed to confirmed",
+//   });
+// });
 
 // change order status
 
-exports.rejectStatus = catchAsyncErrors(async (req, res, nex) => {
+exports.rejectStatus = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   try {
     const productId = req.params.productId;
     const userId = req.user._id;
@@ -834,6 +855,9 @@ exports.rejectStatus = catchAsyncErrors(async (req, res, nex) => {
 });
 
 exports.changeTiming = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   try {
     const userId = req.user._id;
 
@@ -858,6 +882,9 @@ exports.changeTiming = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.openCloseShop = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   const userId = req.user._id;
   const user = await User.findById(userId);
   if (user.shopOpen == true) {
@@ -919,6 +946,9 @@ exports.saveTrip = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.addDiscount = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   const { userId } = req.params
   const { discount } = req.body
   console.log(userId);
@@ -931,7 +961,11 @@ exports.addDiscount = catchAsyncErrors(async (req, res, next) => {
   return res.send(seller)
 
 })
+
 exports.paymentMode = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   const { orderId, status } = req.params
 
   const order = await Order.findById(orderId)
@@ -947,7 +981,10 @@ exports.paymentMode = catchAsyncErrors(async (req, res, next) => {
 
 })
 
-exports.genratePin = catchAsyncErrors(async (req, res) => {
+exports.genratePin = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   // Get the userId and PIN provided by the user from the request body
   const userId = req.user._id;
   const { pin } = req.body
@@ -965,7 +1002,10 @@ exports.genratePin = catchAsyncErrors(async (req, res) => {
   return res.json({ success: true, msg: `Pin Created new Pin is ` + pin });
 });
 
-exports.deletePin = catchAsyncErrors(async (req, res) => {
+exports.deletePin = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   const userId = req.user._id;
   const { pin } = req.body;
 
@@ -987,7 +1027,10 @@ exports.deletePin = catchAsyncErrors(async (req, res) => {
   return res.json({ success: true, msg: "PIN Deleted" });
 })
 
-exports.editPin = catchAsyncErrors(async (req, res) => {
+exports.editPin = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   const userId = req.user._id;
   const { newPin, oldPin } = req.body;
 
@@ -1007,7 +1050,7 @@ exports.editPin = catchAsyncErrors(async (req, res) => {
 
 })
 
-exports.verifyPin = catchAsyncErrors(async (req, res) => {
+exports.verifyPin = catchAsyncErrors(async (req, res, next) => {
   const userId = req.user._id;
   const { pin } = req.body;
   const user = await User.findById(userId);
@@ -1023,7 +1066,10 @@ exports.verifyPin = catchAsyncErrors(async (req, res) => {
   return res.send({ success: true })
 });
 
-exports.getPinStatus = catchAsyncErrors(async (req, res) => {
+exports.getPinStatus = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   const userId = req.user._id;
   const user = await User.findById(userId);
   const status = user.isPin
@@ -1038,7 +1084,10 @@ exports.getPinStatus = catchAsyncErrors(async (req, res) => {
 
 // code for hotel usre seprate it in future
 
-exports.addGuest = catchAsyncErrors(async (req, res) => {
+exports.addGuest = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
   const {
     invoiceNum,
     guestName,
@@ -1116,38 +1165,29 @@ exports.reports = catchAsyncErrors(async (req, res) => {
 
 exports.kotPush = catchAsyncErrors(async (req, res) => {
   const user = req.user._id;
-
   const { item, date, qty } = req.body
   const kotData = new KOT({
     ...req.body,
     user
   })
-
   await kotData.save()
-
   return res.send({ kotData, success: true })
-
 })
 
 exports.kotaGet = catchAsyncErrors(async (req, res) => {
   const userId = req.user._id;
-
   const kot = await KOT.find({ user: userId })
-
   if (!kot) {
     return res.send({ succes: false })
   }
-
   return res.send(kot)
 })
 
 exports.kotaGetAll = catchAsyncErrors(async (req, res) => {
-
   const { kotId } = req.params
   const kot = await KOT.findById(kotId)
   if (!kot) {
     return res.send({ succes: false })
   }
-
   return res.send(kot)
 })
