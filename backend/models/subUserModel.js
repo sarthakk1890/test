@@ -6,10 +6,10 @@ const crypto = require("crypto");
 
 const subUserSchema = new mongoose.Schema(
     {
-        name:{
+        name: {
             type: String,
         },
-        
+
         email: {
             type: String,
             required: [true, "Please Enter Your Email"],
@@ -25,7 +25,7 @@ const subUserSchema = new mongoose.Schema(
             select: false,
             trim: true,
         },
-        
+
         phoneNumber: {
             type: Number,
             required: [true, "Please enter your phone Number"],
@@ -49,6 +49,11 @@ const subUserSchema = new mongoose.Schema(
             type: Date,
             default: Date.now,
         },
+
+        emailOTP: String,
+
+        emailOTPExpire: Date,
+
         resetPasswordToken: String,
         resetPasswordExpire: Date,
     },
@@ -68,6 +73,20 @@ subUserSchema.methods.getJWTToken = function () {
     return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRE,
     });
+};
+
+subUserSchema.methods.generateAndStoreOTP = async function () {
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Store OTP in the user document
+    this.emailOTP = otp;
+    this.emailOTPExpire = Date.now() + 15 * 60 * 1000;
+
+    // Save the user document
+    await this.save();
+
+    return otp;
 };
 
 // Compare Password

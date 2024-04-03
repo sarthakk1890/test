@@ -1205,12 +1205,24 @@ const transporter = nodeMailer.createTransport({
 exports.sendEmailOtp = catchAsyncErrors(async (req, res, next) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
+  let subUser;
 
   if (!user) {
+    subUser = await subUserModel.findOne({ email })
+  }
+
+  if (!user && !subUser) {
     return next(new ErrorHandler("User not found", 403));
   }
 
-  const otp = await user.generateAndStoreOTP()
+  let otp;
+
+  if (user) {
+    otp = await user.generateAndStoreOTP()
+  }
+  else if(subUser){
+    otp = await subUser.generateAndStoreOTP()
+  }
 
   const emailBody = `
     <div>
@@ -1237,24 +1249,34 @@ exports.sendEmailOtp = catchAsyncErrors(async (req, res, next) => {
 
 exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
   const { email, otp, newPassword } = req.body;
-  const user = await User.findOne({ email });
+  let user, subUser;
+
+  user = await User.findOne({ email });
+
   if (!user) {
+    subUser = await subUserModel.findOne({ email });
+  }
+
+  if (!user && !subUser) {
     return next(new ErrorHandler("User not found", 403));
   }
 
-  if (user.emailOTP !== otp || user.emailOTPExpire < Date.now()) {
+  let userToUpdate;
+  if (user && (user.emailOTP === otp && user.emailOTPExpire > Date.now())) {
+    userToUpdate = user;
+  } else if (subUser && (subUser.emailOTP === otp && subUser.emailOTPExpire > Date.now())) {
+    userToUpdate = subUser;
+  } else {
     return res.status(400).json({ error: 'Invalid or expired OTP.' });
   }
 
-  // Reset password
-  user.password = newPassword;
-  user.emailOTP = undefined; // Clear OTP
-  user.emailOTPExpire = undefined; // Clear OTP expiration time
-  await user.save();
+  userToUpdate.password = newPassword;
+  userToUpdate.emailOTP = undefined;
+  userToUpdate.emailOTPExpire = undefined;
+  await userToUpdate.save();
 
   return res.send({
     success: true,
     message: "Password reset successfully"
-  })
-
-})
+  });
+});
