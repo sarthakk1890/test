@@ -215,6 +215,11 @@ async function updateStock(id, quantity) {
 
 // delete Order -- Admin
 exports.deleteSalesOrder = catchAsyncErrors(async (req, res, next) => {
+
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
+
   const salesOrder = await SalesOrder.findById(req.params.id);
 
   if (!salesOrder) {

@@ -158,6 +158,11 @@ async function calcTotalAmount(orderItems) {
 
 // delete Order -- Admin
 exports.deletePurchaseOrder = catchAsyncErrors(async (req, res, next) => {
+
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
+
   const purchaseOrder = await PurchaseOrder.findById(req.params.id);
 
   if (!purchaseOrder) {
@@ -212,10 +217,10 @@ exports.addCreditHistoryTransaction = catchAsyncErrors(
     const { amount } = req.body;
     let modeOfPayment = req.body.modeOfPayment;
 
-    if(!Array.isArray(modeOfPayment)){
+    if (!Array.isArray(modeOfPayment)) {
       const mode = modeOfPayment;
-      
-      modeOfPayment = [{mode, amount}]
+
+      modeOfPayment = [{ mode, amount }]
     }
 
     const order = {
