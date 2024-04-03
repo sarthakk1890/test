@@ -529,6 +529,7 @@ exports.updateUpi = catchAsyncErrors(async (req, res, next) => {
 const multer = require("multer");
 const orderedItem = require("../models/orderedItem");
 const subUserModel = require("../models/subUserModel");
+const nodeMailer = require("nodemailer");
 
 exports.uploadData = catchAsyncErrors(async (req, res, next) => {
   if (req.cookies.token_subuser) {
@@ -1190,4 +1191,70 @@ exports.kotaGetAll = catchAsyncErrors(async (req, res) => {
     return res.send({ succes: false })
   }
   return res.send(kot)
+})
+
+//-----------Sending otp through email
+const transporter = nodeMailer.createTransport({
+  service: 'Gmail', // Use your email service provider
+  auth: {
+    user: process.env.NODEMAILER_USER, // Your email address
+    pass: process.env.NODEMAILER_PASS, // Your email password
+  },
+});
+
+exports.sendEmailOtp = catchAsyncErrors(async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return next(new ErrorHandler("User not found", 403));
+  }
+
+  const otp = await user.generateAndStoreOTP()
+
+  const emailBody = `
+    <div>
+      <p>Your OTP for password reset is: </p>
+      <p style="font-size: 24px; font-weight: bold;">${otp}</p>
+      <br/>
+      <p><b>Note: </b>If you didn't applied for password reset contact us as soon as possible</p>
+    </div>
+  `;
+
+  await transporter.sendMail({
+    from: process.env.NODEMAILER_USER,
+    to: email,
+    subject: 'OTP Verification',
+    html: emailBody
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: 'OTP sent successfully.'
+  });
+
+})
+
+exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
+  const { email, otp, newPassword } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(new ErrorHandler("User not found", 403));
+  }
+
+  if (user.emailOTP !== otp || user.emailOTPExpire < Date.now()) {
+    return res.status(400).json({ error: 'Invalid or expired OTP.' });
+  }
+
+  // Reset password
+  user.password = newPassword;
+  user.emailOTP = undefined; // Clear OTP
+  user.emailOTPExpire = undefined; // Clear OTP expiration time
+  await user.save();
+
+  return res.send({
+    success: true,
+    message: "Password reset successfully"
+  })
+
 })

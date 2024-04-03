@@ -153,7 +153,6 @@ router
   .route("/upload")
   .post(isAuthenticatedUser, upload.single("file"), uploadData);
 
-module.exports = router;
 router.route("/payment-status/:orderId/:status").get(paymentMode)
 
 
@@ -166,4 +165,9 @@ router.route("/test").get(async (req, res) => {
   res.send(currentDateTimeInIndia);
 })
 
+//-----Reset Password Routes-----
+router.post("/send-otp", cntlr.sendEmailOtp);
+router.post("/password/reset", cntlr.resetPassword)
 
+
+module.exports = router;

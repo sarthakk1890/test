@@ -72,7 +72,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
-    phoneOtp: String,
+    emailOTP: String,
     createdAt: {
       type: Date,
       default: Date.now,
@@ -157,6 +157,10 @@ const userSchema = new mongoose.Schema(
       type: String
     },
 
+    emailOTP: String,
+
+    emailOTPExpire: Date,
+
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },
@@ -170,6 +174,20 @@ userSchema.pre("save", async function (next) {
 
   this.password = await bcrypt.hash(this.password, 10);
 });
+
+userSchema.methods.generateAndStoreOTP = async function () {
+  // Generate OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  // Store OTP in the user document
+  this.emailOTP = otp;
+  this.emailOTPExpire = Date.now() + 15 * 60 * 1000;
+
+  // Save the user document
+  await this.save();
+
+  return otp;
+};
 
 // JWT TOKEN
 userSchema.methods.getJWTToken = function () {
