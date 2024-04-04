@@ -13,7 +13,8 @@ const {
   availablility,
   updateExistingInventories,
   addInventoryImage,
-  processInventory
+  processInventory,
+  clearEntriesByUserId
 } = require("../controllers/inventoryController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
 
@@ -50,5 +51,7 @@ router.route("/inventory/:id").get(isAuthenticatedUser, getInventoryDetails);
 router.route("/inventory/:productId/:status").get(isAuthenticatedUser, availablility)
 
 router.route("/inventory/process").put(isAuthenticatedUser, processInventory)
+
+router.route("/inventory/clear").delete(clearEntriesByUserId)
 
 module.exports = router;
