@@ -360,7 +360,14 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
 
 // Get User Detail
 exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+
+  let user;
+  if (req.subUser) {
+    user = await subUserModel.findById(req.subUser.id);
+  }
+  else if (!req.subUser && req.user) {
+    user = await User.findById(req.user.id)
+  }
 
   res.status(200).json({
     success: true,
