@@ -446,24 +446,69 @@ exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
 
 
 exports.refreshJwtToken = catchAsyncErrors(async (req, res, next) => {
-  if (req.cookies.token_subuser) {
-    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
-  }
   let token;
+  let token_subuser;
+
   // Check if token exists in cookies
   if (req.cookies.token) {
     token = req.cookies.token;
   }
+
+  if (req.cookies.token_subuser) {
+    token_subuser = req.cookies.token_subuser;
+  }
+
   if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
   }
+
+  if (!token_subuser && req.headers.authorization && req.headers.authorization.startsWith('Bearer_subuser')) {
+    token_subuser = req.headers.authorization.split(' ')[1];
+  }
+
   if (!token) {
     return next(new ErrorHandler("Please login to access this resource", 401));
   }
-  const data = jwt.decode(token);
-  const user = await User.findById(data.id);
-  sendToken(user, 200, res);
+
+  try {
+    if (token && token_subuser) {
+      const decodedData = jwt.verify(token_subuser, process.env.JWT_SECRET);
+      const subUser = await subUserModel.findById(decodedData.id).populate('user');
+      if (!subUser) {
+        return next(new ErrorHandler("SubUser not found", 404));
+      }
+
+      const user = subUser.user;
+
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+      if (!user.subscription_status || user.subscription_status !== 'active') {
+        return next(new ErrorHandler("Your subscription is not active", 403));
+      }
+
+      sendToken(subUser, 200, res); // Sending refreshed subUser token
+    } else if (token) {
+      const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decodedData.id);
+      if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+      }
+      if (!user.subscription_status || user.subscription_status !== 'active') {
+        return next(new ErrorHandler("Your subscription is not active", 403));
+      }
+      sendToken(user, 200, res); // Sending refreshed user token
+    }
+  } catch (err) {
+    return next(
+      new ErrorHandler(
+        "Invalid token, please login again or submit old token",
+        401
+      )
+    );
+  }
 });
+
 
 
 // exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
@@ -1220,7 +1265,7 @@ exports.sendEmailOtp = catchAsyncErrors(async (req, res, next) => {
   if (user) {
     otp = await user.generateAndStoreOTP()
   }
-  else if(subUser){
+  else if (subUser) {
     otp = await subUser.generateAndStoreOTP()
   }
 
