@@ -487,7 +487,8 @@ exports.refreshJwtToken = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("Your subscription is not active", 403));
       }
 
-      sendToken(subUser, 200, res); // Sending refreshed subUser token
+      sendToken(user, 200, res, subUser);
+
     } else if (token) {
       const decodedData = jwt.verify(token, process.env.JWT_SECRET);
       const user = await User.findById(decodedData.id);
