@@ -5,6 +5,7 @@ const moment = require('moment-timezone');
 const KOT = require("../models/kotModel");
 const BillingOrder = require("../models/billingOrderModel");
 const qrOrderModel = require("../models/qrOrderModel");
+const userModel = require("../models/userModel");
 
 //-----Helper functions-----
 function currentDate() {
@@ -15,6 +16,20 @@ function currentDate() {
 
 // create new qr order
 exports.createQrOrder = catchAsyncErrors(async (req, res, next) => {
+
+    const phoneNumber = req.body.phoneNumber;
+
+    const user = await userModel.findOne({ phoneNumber });
+
+    if (!user) {
+        return res.status(404).json({
+            success: false,
+            message: 'Unable to create Order'
+        });
+    }
+
+    req.body.user = user._id;
+
     req.body.createdAt = currentDate();
     const qrOrder = await qrOrderModel.create(req.body);
     res.status(201).json({
