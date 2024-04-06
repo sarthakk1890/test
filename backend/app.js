@@ -237,6 +237,8 @@ const activeMemberships = require("./models/activeMemberships");
 const version = require('./routes/versionRoute');
 //----Import sub User routes-------------
 const subUser = require('./routes/subUserRoute.js')
+//----QR order routes--------------------
+const qrOrder = require('./routes/qrOrderRoute.js')
 
 const corsConfig = {
   origin: "http://localhost:5500",
@@ -322,6 +324,8 @@ app.use("/api/v1/attendance", attendance);
 app.use("/api/v1/version", version);
 //----Sub User-------------
 app.use("/api/v1", subUser);
+//----QR Order-------------
+app.use("/api/v1", qrOrder)
 
 //Getting current date route
 app.get('/api/v1/current-date', (req, res) => {

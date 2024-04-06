@@ -136,7 +136,7 @@ exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
   if (!id) {
     return next(new ErrorHandler("Please provide id as query param", 400));
   }
-  const seller = await User.findById(id);
+  const seller = await User.findOne({ phoneNumber: id });
   if (!seller) {
     return next(new ErrorHandler("User not found", 404));
   }
@@ -161,7 +161,8 @@ exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
     data: products,
     total_products,
     total_pages,
-    sellerName: seller.businessName
+    sellerName: seller.businessName,
+    sellerId: seller._id
   });
 });
 
