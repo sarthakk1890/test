@@ -137,18 +137,19 @@ exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Please provide id as query param", 400));
   }
   const seller = await User.findOne({ phoneNumber: id });
+
   if (!seller) {
     return next(new ErrorHandler("User not found", 404));
   }
   const apiFeature = new ApiFeatures(
     Inventory.find({
-      user: id,
+      user: seller._id,
       available: true
     }),
     req.query
   ).pagination(per_page_data);
 
-  const total_products = await Inventory.countDocuments({ user: id, available: true });
+  const total_products = await Inventory.countDocuments({ user: seller._id, available: true });
 
   const total_pages = Math.ceil(total_products / 20);
 
@@ -161,8 +162,7 @@ exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
     data: products,
     total_products,
     total_pages,
-    sellerName: seller.businessName,
-    sellerId: seller._id
+    sellerName: seller.businessName
   });
 });
 
