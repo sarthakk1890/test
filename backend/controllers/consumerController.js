@@ -162,7 +162,8 @@ exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
     data: products,
     total_products,
     total_pages,
-    sellerName: seller.businessName
+    sellerName: seller.businessName,
+    shopLocality: seller.address.locality
   });
 });
 
