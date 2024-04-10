@@ -1,13 +1,13 @@
 const mongoose = require("mongoose");
 
 const subProductSchema = new mongoose.Schema({
-  name:{
+  name: {
     type: String,
     required: true
   },
   inventoryId: {
     type: mongoose.Schema.ObjectId,
-    required: true, 
+    required: true,
   },
   quantity: {
     type: Number,
@@ -44,7 +44,7 @@ const inventorySchema = mongoose.Schema(
     },
 
     //------Added MRP--------------
-    mrp:{
+    mrp: {
       type: Number,
       required: false
     },
@@ -162,7 +162,7 @@ const inventorySchema = mongoose.Schema(
     },
 
     //Added unit
-    unit:{
+    unit: {
       type: String,
       required: false
     }

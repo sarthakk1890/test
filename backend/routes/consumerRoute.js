@@ -139,7 +139,6 @@ router.route("/policy").get(policyPage);
 
 router.route('/seller/:sellerName/products').get(getAllProductsFromSeller);
 
-
 //QR routes
 router.route("/sellerProduct/:id").get(getProductsOfUser);
 

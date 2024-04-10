@@ -131,41 +131,74 @@ exports.getSellers = catchAsyncErrors(async (req, res, next) => {
 // get all products from a user
 exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
-  const per_page_data = 20;
 
   if (!id) {
     return next(new ErrorHandler("Please provide id as query param", 400));
   }
+
   const seller = await User.findOne({ phoneNumber: id });
 
   if (!seller) {
     return next(new ErrorHandler("User not found", 404));
   }
-  const apiFeature = new ApiFeatures(
-    Inventory.find({
-      user: seller._id,
-      available: true
-    }),
-    req.query
-  ).pagination(per_page_data);
 
-  const total_products = await Inventory.countDocuments({ user: seller._id, available: true });
+  const products = await Inventory.find({ user: seller._id, available: true }).lean();
 
-  const total_pages = Math.ceil(total_products / 20);
-
-  const products = await apiFeature.query;
-  if (!products) {
+  if (!products || products.length === 0) {
     return next(new ErrorHandler("No products found", 404));
   }
+
   res.status(200).json({
     success: true,
     data: products,
-    total_products,
-    total_pages,
     sellerName: seller.businessName,
     shopLocality: seller.address.locality
   });
 });
+// exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
+//   const id = req.params.id;
+
+//   if (!id) {
+//     return next(new ErrorHandler("Please provide id as query param", 400));
+//   }
+
+//   const seller = await User.findOne({ phoneNumber: id });
+
+//   if (!seller) {
+//     return next(new ErrorHandler("User not found", 404));
+//   }
+
+//   const products = await Inventory.find({ user: seller._id, available: true }).lean();
+
+//   if (!products || products.length === 0) {
+//     return next(new ErrorHandler("No products found", 404));
+//   }
+
+//   // Group products by category
+//   const groupedProducts = {};
+//   products.forEach(product => {
+//     const category = (product.category || 'No-category').toLowerCase();
+
+//     if (!groupedProducts[category]) {
+//       groupedProducts[category] = [];
+//     }
+//     groupedProducts[category].push(product);
+//   });
+
+//   // Convert groupedProducts object to an array
+//   const formattedProducts = Object.keys(groupedProducts).map(category => ({
+//     category,
+//     products: groupedProducts[category]
+//   }));
+
+//   res.status(200).json({
+//     success: true,
+//     data: formattedProducts,
+//     sellerName: seller.businessName,
+//     shopLocality: seller.address.locality
+//   });
+// });
+
 
 // get all sellers and search by name :
 exports.getSellersByName = catchAsyncErrors(async (req, res, next) => {
