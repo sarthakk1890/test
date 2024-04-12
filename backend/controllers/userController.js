@@ -363,7 +363,7 @@ exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
 
   const user = await User.findById(req.user.id);
   let subUser;
-  
+
   if (req.subUser) {
     subUser = await subUserModel.findById(req.subUser.id);
   }
@@ -1121,9 +1121,6 @@ exports.verifyPin = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getPinStatus = catchAsyncErrors(async (req, res, next) => {
-  // if (req.cookies.token_subuser) {
-  //   return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
-  // }
   const userId = req.user._id;
   const user = await User.findById(userId);
   const status = user.isPin

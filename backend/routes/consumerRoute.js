@@ -34,6 +34,7 @@ const {
   rating,
   addAddress,
   deleteAccountPage,
+  getUniqueCategoriesOfUser,
 } = require("../controllers/consumerController");
 const {
   getAllInventoriesAndSearch,
@@ -141,6 +142,7 @@ router.route('/seller/:sellerName/products').get(getAllProductsFromSeller);
 
 //QR routes
 router.route("/sellerProduct/:id").get(getProductsOfUser);
+router.route("/sellerProduct/categories/:phoneNumber").get(getUniqueCategoriesOfUser);
 
 
 module.exports = router;

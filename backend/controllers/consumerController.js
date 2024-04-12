@@ -131,73 +131,86 @@ exports.getSellers = catchAsyncErrors(async (req, res, next) => {
 // get all products from a user
 exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
+  const per_page_data = 20;
 
   if (!id) {
     return next(new ErrorHandler("Please provide id as query param", 400));
   }
-
   const seller = await User.findOne({ phoneNumber: id });
 
   if (!seller) {
     return next(new ErrorHandler("User not found", 404));
   }
 
-  const products = await Inventory.find({ user: seller._id, available: true }).lean();
-
-  if (!products || products.length === 0) {
-    return next(new ErrorHandler("No products found", 404));
+  let category = req.query.category;
+  if (category) {
+    category = decodeURIComponent(category);
+    category = category.toLowerCase();
   }
 
+  const apiFeature = new ApiFeatures(
+    Inventory.find({
+      user: seller._id
+    }),
+    req.query
+  ).search().filter().pagination(per_page_data);
+
+  let countQuery = {
+    user: seller._id
+  };
+
+  if (category) {
+    const escapedCategory = category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    countQuery.category = { $regex: `^${escapedCategory}$`, $options: 'i' };
+  }
+
+  // Count documents matching countQuery
+  const total_products = await Inventory.countDocuments(countQuery);
+
+  const total_pages = Math.ceil(total_products / per_page_data);
+
+  const products = await apiFeature.query;
+  if (!products) {
+    return next(new ErrorHandler("No products found", 404));
+  }
   res.status(200).json({
     success: true,
     data: products,
+    total_products,
+    total_pages,
     sellerName: seller.businessName,
     shopLocality: seller.address.locality
   });
 });
-// exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
-//   const id = req.params.id;
 
-//   if (!id) {
-//     return next(new ErrorHandler("Please provide id as query param", 400));
-//   }
 
-//   const seller = await User.findOne({ phoneNumber: id });
+exports.getUniqueCategoriesOfUser = catchAsyncErrors(async (req, res, next) => {
+  const phoneNumber = req.params.phoneNumber;
 
-//   if (!seller) {
-//     return next(new ErrorHandler("User not found", 404));
-//   }
+  if (!phoneNumber) {
+    return next(new ErrorHandler("Please provide phone number as query param", 400));
+  }
 
-//   const products = await Inventory.find({ user: seller._id, available: true }).lean();
+  const user = await User.findOne({ phoneNumber });
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
 
-//   if (!products || products.length === 0) {
-//     return next(new ErrorHandler("No products found", 404));
-//   }
+  let query = {
+    user: user._id
+  };
 
-//   // Group products by category
-//   const groupedProducts = {};
-//   products.forEach(product => {
-//     const category = (product.category || 'No-category').toLowerCase();
+  const uniqueCategories = await Inventory.distinct("category", query);
 
-//     if (!groupedProducts[category]) {
-//       groupedProducts[category] = [];
-//     }
-//     groupedProducts[category].push(product);
-//   });
+  if (!uniqueCategories || uniqueCategories.length === 0) {
+    return next(new ErrorHandler("No categories found", 404));
+  }
 
-//   // Convert groupedProducts object to an array
-//   const formattedProducts = Object.keys(groupedProducts).map(category => ({
-//     category,
-//     products: groupedProducts[category]
-//   }));
-
-//   res.status(200).json({
-//     success: true,
-//     data: formattedProducts,
-//     sellerName: seller.businessName,
-//     shopLocality: seller.address.locality
-//   });
-// });
+  res.status(200).json({
+    success: true,
+    categories: uniqueCategories
+  });
+});
 
 
 // get all sellers and search by name :

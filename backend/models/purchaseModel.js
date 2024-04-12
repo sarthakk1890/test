@@ -183,6 +183,12 @@ const purchaseSchema = new mongoose.Schema({
   businessGST: {
     type: String,
   },
+  userName: {
+    type: String,
+  },
+  subUserName: {
+    type: String,
+  }
 });
 
 module.exports = mongoose.model("PurchaseModel", purchaseSchema);

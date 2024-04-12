@@ -33,15 +33,29 @@ exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
     ? [{ mode: modeOfPayment, amount: total }]
     : modeOfPayment;
 
-  const purchaseOrder = await PurchaseOrder.create({
+  const userName = req.user.businessName;
+  let subUserName;
+
+  if (req.subUser) {
+    subUserName = req.subUser.name;
+  }
+
+  const purchaseOrderData = {
     orderItems,
     modeOfPayment: paymentArray,
     party,
     total,
     user: req.user._id,
     invoiceNum,
-    createdAt: currentDateTimeInIndia
-  });
+    createdAt: currentDateTimeInIndia,
+    userName
+  }
+
+  if (subUserName) {
+    purchaseOrderData.subUserName = subUserName;
+  }
+
+  const purchaseOrder = await PurchaseOrder.create(purchaseOrderData);
 
   // Increment numSales in User model
   await User.findByIdAndUpdate(req.user._id, { $inc: { numPurchases: 1 } });
