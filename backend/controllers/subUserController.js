@@ -110,3 +110,27 @@ exports.getAllSubUsers = catchAsyncErrors(async (req, res, next) => {
         subUsers,
     });
 });
+
+
+//Get subUser from ID
+exports.getSubUserDetails = catchAsyncErrors(async (req, res, next) => {
+
+    if (req.cookies.token_subuser) {
+        return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+    }
+
+    const subUserId = req.params.id;
+    const user = req.user._id;
+
+    const subUSer = await subUserModel.findOne({ _id: subUserId, user });
+
+    if (!subUSer) {
+        return next(new ErrorHandler("Subuser not found", 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        subUSer,
+    });
+
+})

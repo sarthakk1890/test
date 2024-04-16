@@ -209,6 +209,10 @@ exports.getReportofUserAdmin = catchAsyncErrors(async (req, res, next) => {
 //--------------------New User Delete Controller--------------------
 exports.removeUserCompletely = catchAsyncErrors(async (req, res, next) => {
 
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
+
   const user = req.user._id;
 
   await activeMemberships.deleteMany({ user });

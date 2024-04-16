@@ -136,8 +136,6 @@ router.route('/kot/get').get(isAuthenticatedUser, kotaGetAll)
 
 
 
-
-
 //multerconnection
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
