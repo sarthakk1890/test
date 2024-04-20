@@ -51,12 +51,19 @@ exports.getBillingOrder = catchAsyncErrors(async (req, res, next) => {
 exports.updateBillingOrder = catchAsyncErrors(async (req, res, next) => {
 
     const { kotId } = req.params;
-    const updatedFields = req.body;
     const user = req.user._id
+
+    req.body.userName = req.user.businessName;
+
+    let subUserName = null;
+    if (req.subUser) {
+        subUserName = req.subUser.name;
+    }
+    req.body.subUserName = subUserName;
 
     const updatedBillingOrder = await BillingOrder.findOneAndUpdate(
         { kotId, user },
-        updatedFields,
+        req.body,
         { new: true }
     ).populate('user');
 

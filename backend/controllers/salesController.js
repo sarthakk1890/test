@@ -14,7 +14,7 @@ function concatenateValues(obj) {
 
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
-  const { orderItems, modeOfPayment, party, invoiceNum, reciverName, gst, businessName, businessAddress, kotId } = req.body;
+  const { orderItems, modeOfPayment, party, invoiceNum, reciverName, gst, businessName, businessAddress, kotId, subUserName } = req.body;
   const indiaTime = moment.tz('Asia/Kolkata');
   const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
 
@@ -53,7 +53,6 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
     // Reduce main product quantity
     product.quantity -= item.quantity;
     await product.save();
-
   }
 
   try {
@@ -64,13 +63,8 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
       ? [{ mode: modeOfPayment, amount: total }]
       : modeOfPayment;
 
-
-    const userName = req.user.businessName;
-    let subUserName;
-
-    if (req.subUser) {
-      subUserName = req.subUser.name;
-    }
+    const userName = req.user ? req.user.businessName : undefined;
+    const finalSubUserName = subUserName || (req.subUser ? req.subUser.name : undefined);
 
     const salesOrderData = {
       orderItems,
@@ -85,17 +79,19 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
       businessAddress,
       gst,
       kotId,
-      userName
+      userName,
     };
 
-    if (subUserName) {
-      salesOrderData.subUserName = subUserName;
+    if (finalSubUserName) {
+      salesOrderData.subUserName = finalSubUserName;
     }
 
     const salesOrder = await SalesOrder.create(salesOrderData);
 
     // Increment numSales in User model
-    await User.findByIdAndUpdate(req.user._id, { $inc: { numSales: 1 } });
+    if (req.user) {
+      await User.findByIdAndUpdate(req.user._id, { $inc: { numSales: 1 } });
+    }
 
     res.status(201).json({
       success: true,
@@ -335,6 +331,13 @@ exports.UpdateSalesOrder = catchAsyncErrors(async (req, res, next) => {
   salesOrder.modeOfPayment[0].amount = total;
   salesOrder.total = total;
 
+  salesOrder.userName = req.user.businessName;
+  let subUserName = null;
+  if (req.subUser) {
+    subUserName = req.subUser.name;
+  }
+  salesOrder.subUserName = subUserName;
+
   const updatedSalesOrder = await salesOrder.save();
 
   res.status(200).json({
@@ -446,6 +449,10 @@ exports.resetSalesCount = catchAsyncErrors(async (req, res, next) => {
 
 //----Delete Sales using Invoice number-----------
 exports.deleteUsingInvoiceNum = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
+
   const invoiceNumToDelete = req.params.invoiceNum;
   const userId = req.user._id;
 

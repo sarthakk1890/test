@@ -72,7 +72,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
-    emailOTP: String,
+    phoneOtp: String,
     createdAt: {
       type: Date,
       default: Date.now,

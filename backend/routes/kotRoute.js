@@ -1,7 +1,7 @@
 const express = require("express");
 const { isAuthenticatedUser } = require("../middleware/auth");
 const { createKot, getKot, updateKot, getSingleKot, deletekot } = require("../controllers/kotController");
-const { create } = require("../models/agentModel");
+//const { create } = require("../models/agentModel");
 const { createBillingOrder, getBillingOrder, updateBillingOrder, deleteBillingOrder, updateOrderStatus } = require("../controllers/billingOrderController");
 
 const router = express.Router();

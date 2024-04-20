@@ -146,6 +146,13 @@ exports.updatePurchaseOrder = catchAsyncErrors(async (req, res, next) => {
     purchaseOrder.deliveredAt = Date.now();
   }
 
+  purchaseOrder.userName = req.user.businessName;
+  let subUserName = null;
+  if (req.subUser) {
+    subUserName = req.subUser.name;
+  }
+  purchaseOrder.subUserName = subUserName;
+
   await purchaseOrder.save({ validateBeforeSave: false });
   res.status(200).json({
     success: true,

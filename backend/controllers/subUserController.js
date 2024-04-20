@@ -50,7 +50,7 @@ exports.editSubUser = catchAsyncErrors(async (req, res, next) => {
     }
 
     const { subUserId } = req.params;
-    const { name, email, phoneNumber, role } = req.body;
+    const { name, email, phoneNumber, role, password } = req.body;
 
     // Find the subuser by ID
     let subUser = await subUserModel.findOne({ _id: subUserId, user: req.user._id });
@@ -63,6 +63,10 @@ exports.editSubUser = catchAsyncErrors(async (req, res, next) => {
     subUser.email = email || subUser.email;
     subUser.phoneNumber = phoneNumber || subUser.phoneNumber;
     subUser.role = role || subUser.role;
+
+    if (password) {
+        subUser.password = password;
+    }
 
     // Save the updated subuser
     await subUser.save();
@@ -110,7 +114,6 @@ exports.getAllSubUsers = catchAsyncErrors(async (req, res, next) => {
         subUsers,
     });
 });
-
 
 //Get subUser from ID
 exports.getSubUserDetails = catchAsyncErrors(async (req, res, next) => {
