@@ -64,7 +64,7 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
       : modeOfPayment;
 
     const userName = req.user ? req.user.businessName : undefined;
-    const finalSubUserName = subUserName || (req.subUser ? req.subUser.name : undefined);
+    const finalSubUserName = subUserName === "NIL" ? null : subUserName || (req.subUser ? req.subUser.name : undefined);
 
     const salesOrderData = {
       orderItems,
@@ -82,7 +82,7 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
       userName,
     };
 
-    if (finalSubUserName) {
+    if (finalSubUserName !== undefined) {
       salesOrderData.subUserName = finalSubUserName;
     }
 
@@ -101,6 +101,7 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Could not create order", 403));
   }
 });
+
 
 const calcTotalAmount = (orderItems) => {
   let total = 0;
