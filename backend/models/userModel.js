@@ -157,6 +157,23 @@ const userSchema = new mongoose.Schema(
       type: String
     },
 
+    //------------EazeBuzz---------------------------
+    txnid: {
+      type: String
+    },
+    customer_authentication_id: {
+      type: String
+    },
+    plan_validity: {
+      type: Number
+    },
+    updatedAt: {
+      type: String,
+    },
+    checkedAt: {
+      type: String,
+    }
+
     emailOTP: String,
 
     emailOTPExpire: Date,
