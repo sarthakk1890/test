@@ -172,6 +172,9 @@ const userSchema = new mongoose.Schema(
     },
     checkedAt: {
       type: String,
+    },
+    plan_amount:{
+      type: Number,
     }
 
     emailOTP: String,
