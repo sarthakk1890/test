@@ -5,6 +5,7 @@ const ActiveMembership = require("../models/activeMemberships");
 const moment = require('moment-timezone');
 const Sales = require('../models/salesModel');
 const User = require('../models/userModel');
+const Party = require('../models/partyModel');
 
 //-----Helper functions-----
 function currentDate() {
@@ -192,28 +193,42 @@ exports.editMembership = catchAsyncErrors(async (req, res, next) => {
 exports.getAllDues = catchAsyncErrors(async (req, res, next) => {
     try {
         const user = req.user._id;
+        console.log(user);
 
-        // Find all active memberships for the user
         const allActiveMemberships = await ActiveMembership.find({ user })
             .populate('user', 'name email')
-            .populate('party', 'name address phoneNumber type guardianName createdAt')
             .populate('membership', 'plan validity sellingPrice GSTincluded GSTRate CGST SGST IGST membershipType');
 
-        // Calculate total dues for each party using array reduce
-        const partyDuesMap = allActiveMemberships.reduce((acc, membership) => {
-            const partyId = membership.party._id;
-            const dues = membership.due; // Use 'due' instead of 'dues'
+        const partyIds = allActiveMemberships.map(membership => membership.party);
 
-            // If partyId not already in the map, initialize it with dues, else add dues to existing value
-            acc[partyId] = (acc[partyId] || 0) + dues;
+        const existingParties = await Party.find({ _id: { $in: partyIds } });
+
+        const existingPartiesMap = existingParties.reduce((acc, party) => {
+            acc[party._id.toString()] = party;
             return acc;
         }, {});
 
-        // Convert partyDuesMap into array of objects with party information and total dues
-        const partyDuesArray = Object.keys(partyDuesMap).map(partyId => ({
-            party: allActiveMemberships.find(membership => membership.party._id.toString() === partyId.toString()).party,
-            totalDues: partyDuesMap[partyId]
-        }));
+        const validMemberships = allActiveMemberships.filter(membership => existingPartiesMap[membership.party.toString()]);
+
+        await Party.populate(validMemberships, { path: 'party', select: 'name address phoneNumber type guardianName createdAt' });
+
+        const partyDuesMap = validMemberships.reduce((acc, membership) => {
+            if (membership.party && membership.party._id) {
+                const partyId = membership.party._id;
+                const dues = membership.due;
+
+                acc[partyId] = (acc[partyId] || 0) + dues;
+            }
+            return acc;
+        }, {});
+
+        const partyDuesArray = Object.keys(partyDuesMap).map(partyId => {
+            const membership = validMemberships.find(membership => membership.party && membership.party._id.toString() === partyId.toString());
+            return {
+                party: membership.party,
+                totalDues: partyDuesMap[partyId]
+            };
+        });
 
         res.status(200).json({
             success: true,
@@ -227,7 +242,6 @@ exports.getAllDues = catchAsyncErrors(async (req, res, next) => {
         });
     }
 });
-
 
 //Delete Membership
 exports.deleteMembership = catchAsyncErrors(async (req, res, next) => {
